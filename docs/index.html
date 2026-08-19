@@ -325,6 +325,18 @@
   /* Captions are prose and sit in a narrow column, where the balancer runs out of room
      and starts cutting Thai words in half. pretty stays inside the word marks. */
   html.th-wrap figcaption{text-wrap:pretty}
+  /* ---------- feedback ---------- */
+  .fb{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:16px;margin-bottom:20px}
+  .fb-card{
+    display:block;padding:20px;border-radius:13px;
+    background:var(--panel);border:1px solid var(--border);
+    transition:border-color .15s, transform .12s;
+  }
+  .fb-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .fb-ico{display:block;font-size:24px;margin-bottom:10px;line-height:1}
+  .fb-card strong{display:block;color:var(--text);font-size:15.5px;margin-bottom:6px}
+  .fb-card span:not(.fb-ico){display:block;color:var(--muted);font-size:13.6px;line-height:1.62}
+
   /* For short terms that must never be split, whatever the language: "64-bit", "Wi-Fi". */
   .nb{white-space:nowrap}
 
@@ -765,11 +777,43 @@
   </div>
 </section>
 
+<section id="feedback">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 data-i18n="fb.h">เจอปัญหา หรืออยากให้ทำอะไรเพิ่ม</h2>
+      <p data-i18n="fb.sub">ทุกอย่างที่เพิ่มเข้ามาในเวอร์ชันหลังๆ มาจากการที่มีคนบอกว่าใช้แล้วติดตรงไหน</p>
+    </div>
+
+    <div class="fb">
+      <a class="fb-card" href="https://github.com/ziggaza/redesk/issues/new?template=bug.yml">
+        <span class="fb-ico">🐞</span>
+        <strong data-i18n="fb.bugH">แจ้งปัญหา</strong>
+        <span data-i18n="fb.bugP">บอกอาการที่เจอ ถ้าเปิด ReDesk อยู่แล้ว กดปุ่ม “แจ้งปัญหาที่พบ” ในแท็บวิธีใช้งาน จะกรอกข้อมูลระบบให้อัตโนมัติ</span>
+      </a>
+      <a class="fb-card" href="https://github.com/ziggaza/redesk/issues/new?template=idea.yml">
+        <span class="fb-ico">💡</span>
+        <strong data-i18n="fb.ideaH">เสนอไอเดีย</strong>
+        <span data-i18n="fb.ideaP">อยากให้ ReDesk ทำอะไรได้อีก เล่าสถานการณ์ที่เจอมาได้เลย</span>
+      </a>
+      <a class="fb-card" href="https://github.com/ziggaza/redesk/issues">
+        <span class="fb-ico">📋</span>
+        <strong data-i18n="fb.listH">ดูรายการที่แจ้งไว้แล้ว</strong>
+        <span data-i18n="fb.listP">เช็กก่อนว่ามีคนแจ้งเรื่องเดียวกันหรือยัง และติดตามได้ว่าแก้ถึงไหนแล้ว</span>
+      </a>
+    </div>
+
+    <p class="meta" style="text-align:center" data-i18n="fb.note">ใช้บัญชี GitHub (สมัครฟรี) · ถ้าไม่สะดวก กดปุ่ม “คัดลอกข้อมูลระบบ” ในแอปแล้วส่งมาทางไหนก็ได้</p>
+  </div>
+</section>
+
 <footer>
   <div class="wrap foot">
     <div>
       <div style="color:var(--text);font-weight:600;margin-bottom:5px">ReDesk</div>
       <span data-i18n="foot.tag">Desktop Icon Layout Manager · สำหรับ Windows 10 / 11</span>
+      <div style="margin-top:7px">
+        <a href="#feedback" style="color:var(--cyan);text-decoration:none" data-i18n="foot.feedback">แจ้งปัญหาหรือเสนอไอเดีย</a>
+      </div>
     </div>
     <div class="foot-right">
       <span>Powered by <strong>ZigGaZa Studio</strong></span>
@@ -935,7 +979,18 @@ const EN = {
   "dl.notes":"Release notes for every version",
   "dl.meta":"Windows may show a SmartScreen warning because the file is not code-signed yet — click “More info”, then “Run anyway”",
 
-  "foot.tag":"Desktop Icon Layout Manager · for Windows 10 / 11"
+  "fb.h":"Found a bug, or want something added",
+  "fb.sub":"Everything added in the later versions came from someone saying where it got in their way",
+  "fb.bugH":"Report a bug",
+  "fb.bugP":"Tell us what happened. If ReDesk is already open, the “Report a bug” button on its How to use tab fills in the system details for you.",
+  "fb.ideaH":"Suggest an idea",
+  "fb.ideaP":"Something you wish ReDesk could do — describing the situation you ran into helps most",
+  "fb.listH":"See what is already reported",
+  "fb.listP":"Check whether someone has raised the same thing, and follow how far along a fix is",
+  "fb.note":"A free GitHub account is needed · If that does not suit you, press “Copy system information” in the app and send it however you like",
+
+  "foot.tag":"Desktop Icon Layout Manager · for Windows 10 / 11",
+  "foot.feedback":"Report a bug or suggest an idea"
 };
 
 /* ---------------------------------------------------------------------------
