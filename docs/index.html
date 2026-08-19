@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="th" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReDesk — Desktop Icon Layout Manager</title>
+<meta name="description" content="จำและคืนค่าตำแหน่งไอคอนบน Desktop อัตโนมัติ เมื่อถอด-เสียบจอเสริม เปลี่ยนความละเอียด หรือเปลี่ยน DPI scaling รองรับหลายมอนิเตอร์ ใช้ทรัพยากรน้อย">
+<link rel="icon" href="assets/icon.png">
+<link rel="canonical" href="https://ziggaza.github.io/redesk/">
+<meta name="theme-color" content="#0A111C">
+
+<!-- Social cards need absolute URLs: Facebook, LINE and X will not resolve a relative
+     og:image against the page, they simply drop the preview. -->
+<meta property="og:title" content="ReDesk — Desktop Icon Layout Manager">
+<meta property="og:description" content="Save. Restore. Travel back in time.">
+<meta property="og:image" content="https://ziggaza.github.io/redesk/assets/hero.jpg">
+<meta property="og:url" content="https://ziggaza.github.io/redesk/">
+<meta property="og:site_name" content="ZigGaZa Studio">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ReDesk — Desktop Icon Layout Manager">
+<meta name="twitter:description" content="Save. Restore. Travel back in time.">
+<meta name="twitter:image" content="https://ziggaza.github.io/redesk/assets/hero.jpg">
+
+<style>
+  /* Brand hues are shared; only surfaces and text flip between themes, the same
+     arrangement the desktop app uses. */
+  :root{
+    --accent:#2E7DF7; --accent-hot:#4B9BFF; --cyan:#4FBBFF;
+    --success:#2ACD91; --warning:#FFC862; --danger:#FF6B5D; --purple:#9070EC;
+    --page:#0A111C; --panel:#111C2C; --panel-alt:#0D1725; --border:#233450;
+    --text:#F2F6FC; --muted:#AFC0D8;
+    --shadow:rgba(0,0,0,.55);
+    --hero-a:rgba(46,125,247,.20); --hero-b:rgba(79,187,255,.13);
+    --max:1160px;
+  }
+  html[data-theme="light"]{
+    --accent:#1359DE; --accent-hot:#104FF4; --cyan:#0E7BC4;
+    --success:#0E8A57; --warning:#9A6206; --danger:#C7362A; --purple:#6338C6;
+    --page:#EEF1F6; --panel:#FFFFFF; --panel-alt:#F4F7FB; --border:#CFD8E5;
+    --text:#111721; --muted:#4E5A6B;
+    --shadow:rgba(17,23,33,.16);
+    --hero-a:rgba(19,89,222,.12); --hero-b:rgba(14,123,196,.09);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--page); color:var(--text);
+    font-family:"Segoe UI",-apple-system,"Noto Sans Thai",system-ui,sans-serif;
+    line-height:1.65; -webkit-font-smoothing:antialiased;
+    transition:background .2s, color .2s;
+  }
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+  [hidden]{display:none !important}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:color-mix(in srgb, var(--page) 88%, transparent);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-in{display:flex;align-items:center;gap:14px;height:64px}
+  .nav-in>img{width:34px;height:34px}
+  .brand{font-weight:600;font-size:18px;letter-spacing:.2px}
+  .brand span{color:var(--muted);font-weight:400;font-size:13px;display:block;line-height:1.2}
+  .nav-links{margin-left:auto;display:flex;align-items:center;gap:22px}
+  .nav-links a:not(.btn){color:var(--muted);font-size:14px;transition:color .15s}
+  .nav-links a:not(.btn):hover{color:var(--text)}
+
+  /* ---------- toggles ---------- */
+  .switches{display:flex;align-items:center;gap:11px}
+
+  .sw{
+    position:relative;border:1px solid var(--border);background:var(--panel-alt);
+    border-radius:100px;cursor:pointer;padding:0;
+    display:flex;align-items:center;transition:border-color .15s;
+  }
+  .sw:hover{border-color:var(--accent)}
+  .sw:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* theme: moon left, sun right, knob carries the active glyph */
+  .sw-theme{width:60px;height:28px}
+  .sw-theme .ico{
+    position:absolute;top:50%;transform:translateY(-50%);
+    font-size:12px;line-height:1;color:var(--muted);pointer-events:none;
+  }
+  .sw-theme .ico.moon{left:9px}
+  .sw-theme .ico.sun{right:9px}
+  .sw-theme .knob{
+    position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;
+    background:var(--accent);display:grid;place-items:center;font-size:11px;color:#fff;
+    transition:left .18s cubic-bezier(.4,0,.2,1), background .18s;
+    box-shadow:0 1px 5px rgba(0,0,0,.35);
+  }
+  html[data-theme="light"] .sw-theme .knob{left:35px;background:#F0A93B;color:#20160A}
+
+  /* language: segmented pill */
+  .sw-lang{width:84px;height:28px}
+  .sw-lang .pill{
+    position:absolute;top:2px;left:2px;width:calc(50% - 2px);height:22px;
+    border-radius:100px;background:var(--accent);
+    transition:left .18s cubic-bezier(.4,0,.2,1);
+  }
+  html[lang="en"] .sw-lang .pill{left:calc(50%)}
+  .sw-lang span{
+    position:relative;z-index:1;flex:1;text-align:center;
+    font-size:11.5px;font-weight:600;color:var(--muted);transition:color .18s;
+  }
+  html[lang="th"] .sw-lang .lb-th{color:#fff}
+  html[lang="en"] .sw-lang .lb-en{color:#fff}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;
+    background:var(--accent); color:#fff; font-weight:600; font-size:14px;
+    padding:11px 20px; border-radius:9px; border:1px solid var(--accent-hot);
+    transition:transform .12s, box-shadow .2s;
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px color-mix(in srgb, var(--accent) 34%, transparent)}
+  .btn.ghost{background:transparent;border-color:var(--border);color:var(--text)}
+  .btn.ghost:hover{border-color:var(--accent);box-shadow:none}
+  .btn.lg{font-size:15px;padding:14px 26px}
+
+  /* ---------- hero ---------- */
+  header{
+    padding:76px 0 64px;position:relative;overflow:hidden;
+    background:
+      radial-gradient(900px 420px at 15% -10%, var(--hero-a), transparent 62%),
+      radial-gradient(760px 380px at 88% 8%, var(--hero-b), transparent 60%);
+  }
+  .hero{display:grid;grid-template-columns:1.02fr .98fr;gap:52px;align-items:center}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--cyan);
+    border:1px solid color-mix(in srgb, var(--cyan) 34%, transparent);
+    background:color-mix(in srgb, var(--cyan) 9%, transparent);
+    padding:5px 13px;border-radius:100px;margin-bottom:20px;
+  }
+  h1{font-size:clamp(33px,4.4vw,50px);line-height:1.16;font-weight:700;letter-spacing:-.5px}
+  h1 em{font-style:normal;color:var(--accent-hot)}
+  .lede{color:var(--muted);font-size:17px;margin:20px 0 14px;max-width:34em}
+  .lede strong{color:var(--text)}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+  .meta{color:var(--muted);font-size:12.5px;margin-top:16px}
+  .hero-img{border-radius:15px;border:1px solid var(--border);overflow:hidden;
+            box-shadow:0 26px 70px var(--shadow)}
+
+  /* ---------- sections ---------- */
+  /* The nav is sticky, so anchor jumps must stop short of it or the heading lands
+     underneath the bar. */
+  section[id]{scroll-margin-top:78px}
+  section{padding:76px 0;border-top:1px solid var(--border)}
+  .sec-head{margin-bottom:44px}
+  h2{font-size:clamp(25px,3vw,33px);font-weight:700;letter-spacing:-.3px}
+  .sec-head p{color:var(--muted);margin-top:13px;font-size:16px;max-width:62ch}
+
+  .prob{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .prob div{background:var(--panel-alt);border:1px solid var(--border);border-radius:12px;padding:22px}
+  .prob h3{font-size:15.5px;margin-bottom:9px;color:var(--danger);font-weight:600}
+  .prob p{color:var(--muted);font-size:14px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+  .card{
+    background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:26px;
+    transition:border-color .18s, transform .18s;
+  }
+  .card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .ico{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-size:20px;margin-bottom:15px}
+  .card h3{font-size:16.5px;margin-bottom:9px;font-weight:600}
+  .card p{color:var(--muted);font-size:14.2px}
+  .card ul{color:var(--muted);font-size:13.6px;margin:11px 0 0 17px}
+  .card li{margin-bottom:5px}
+  .card strong{color:var(--text)}
+
+  .shots{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  figure{border:1px solid var(--border);border-radius:13px;overflow:hidden;background:var(--panel-alt)}
+  figcaption{padding:13px 17px;color:var(--muted);font-size:13px;border-top:1px solid var(--border)}
+  figcaption strong{color:var(--text)}
+  .full{grid-column:1/-1}
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;counter-reset:s}
+  .step{background:var(--panel-alt);border:1px solid var(--border);border-radius:13px;padding:26px;position:relative}
+  .step::before{
+    counter-increment:s;content:counter(s);position:absolute;top:-15px;left:24px;
+    width:32px;height:32px;border-radius:9px;background:var(--accent);
+    display:grid;place-items:center;font-weight:700;font-size:14.5px;color:#fff;
+  }
+  .step h3{margin:12px 0 9px;font-size:16px;font-weight:600}
+  .step p{color:var(--muted);font-size:14px}
+  .step strong{color:var(--text)}
+
+  table{width:100%;border-collapse:collapse;font-size:14.2px}
+  th,td{text-align:left;padding:13px 15px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{color:var(--muted);font-weight:500;width:36%}
+  td{color:var(--text)}
+  code{
+    background:var(--panel-alt);border:1px solid var(--border);border-radius:5px;
+    padding:1px 6px;font-size:12.6px;font-family:Consolas,monospace;
+  }
+  .tag{
+    display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:100px;
+    background:color-mix(in srgb, var(--success) 16%, transparent);
+    color:var(--success);border:1px solid color-mix(in srgb, var(--success) 34%, transparent);
+  }
+  .tag.warn{
+    background:color-mix(in srgb, var(--warning) 16%, transparent);
+    color:var(--warning);border-color:color-mix(in srgb, var(--warning) 34%, transparent);
+  }
+
+  details{border:1px solid var(--border);border-radius:11px;padding:17px 20px;margin-bottom:11px;background:var(--panel-alt)}
+  details[open]{border-color:var(--accent)}
+  summary{cursor:pointer;font-weight:600;font-size:15px;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";float:right;color:var(--accent);font-weight:400;font-size:19px;line-height:1}
+  details[open] summary::after{content:"−"}
+  details p{color:var(--muted);font-size:14.2px;margin-top:11px}
+  details strong{color:var(--text)}
+
+  .dl{
+    text-align:center;
+    background:linear-gradient(180deg, color-mix(in srgb, var(--accent) 13%, transparent), transparent 72%);
+    border:1px solid var(--border);border-radius:17px;padding:56px 26px;
+  }
+  .dl img{width:78px;height:78px;margin:0 auto 20px}
+  .dl h2{margin-bottom:13px}
+  .dl p{color:var(--muted);max-width:52ch;margin:0 auto 28px;font-size:15.4px}
+
+  /* download counter */
+  .counter{
+    display:inline-flex;align-items:baseline;gap:9px;margin:0 auto 24px;
+    padding:9px 18px;border-radius:100px;
+    background:var(--panel-alt);border:1px solid var(--border);
+  }
+  .counter-num{
+    font-size:22px;font-weight:700;color:var(--accent-hot);
+    font-variant-numeric:tabular-nums;letter-spacing:-.3px;
+  }
+  .counter-label{color:var(--muted);font-size:13.4px}
+  .counter.loading .counter-num{opacity:.4}
+
+  /* Release line and alternate links. Both override .dl p, which is styled for the long
+     paragraph above the button and would otherwise mute and over-space them. */
+  .dl p.dl-release{
+    margin:20px auto 0;max-width:none;font-size:13.6px;color:var(--text);
+    display:flex;justify-content:center;align-items:center;gap:9px;flex-wrap:wrap;
+  }
+  #relVersion{font-weight:700;color:var(--accent-hot);font-variant-numeric:tabular-nums}
+  .dl p.dl-alt{
+    margin:11px auto 0;max-width:none;
+    display:flex;justify-content:center;align-items:center;gap:9px;flex-wrap:wrap;
+  }
+  .dl-alt a{color:var(--cyan);text-decoration:none;border-bottom:1px solid transparent}
+  .dl-alt a:hover{border-bottom-color:currentColor}
+  /* Separator dots. --border is too faint against the panel gradient to read as a
+     separator, so these follow the muted text colour instead. */
+  .dot{color:var(--muted);opacity:.55;user-select:none}
+
+  footer{border-top:1px solid var(--border);padding:44px 0 56px;color:var(--muted);font-size:13.4px}
+  .foot{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .foot-right{margin-left:auto;display:flex;align-items:center;gap:11px}
+  .foot-right img{height:34px}
+  .foot-right strong{color:var(--text)}
+  html[data-theme="light"] .foot-right img{
+    /* The mark is a light-on-dark cutout; on a white footer it needs a dark plate. */
+    background:#0B1622;border-radius:7px;padding:4px 7px;
+  }
+
+  @media(max-width:900px){
+    .hero,.shots,.steps,.prob{grid-template-columns:1fr}
+    .nav-links a:not(.btn){display:none}
+    section{padding:56px 0}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <img src="assets/logo.png" alt="ReDesk">
+    <div class="brand">ReDesk<span data-i18n="brand.sub">Desktop Icon Layout Manager</span></div>
+    <div class="nav-links">
+      <a href="#features" data-i18n="nav.features">คุณสมบัติ</a>
+      <a href="#how" data-i18n="nav.how">วิธีใช้</a>
+      <a href="#specs" data-i18n="nav.specs">สเปก</a>
+      <a href="#faq" data-i18n="nav.faq">คำถามพบบ่อย</a>
+
+      <div class="switches">
+        <button class="sw sw-theme" id="swTheme" type="button" aria-label="Toggle dark / light theme">
+          <span class="ico moon">🌙</span>
+          <span class="ico sun">☀</span>
+          <span class="knob" id="knobGlyph">🌙</span>
+        </button>
+        <button class="sw sw-lang" id="swLang" type="button" aria-label="สลับภาษา / switch language">
+          <span class="pill"></span>
+          <span class="lb-th">ไทย</span>
+          <span class="lb-en">EN</span>
+        </button>
+      </div>
+
+      <a class="btn" href="#download" data-i18n="nav.download">ดาวน์โหลด</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap hero">
+    <div>
+      <div class="eyebrow" data-i18n="hero.badge">◆ ฟรี · สำหรับ Windows 10 / 11</div>
+      <h1 data-i18n-html="hero.title">ไอคอนเดสก์ท็อปของคุณ<br><em>จะไม่กระจัดกระจายอีก</em></h1>
+      <p class="lede" data-i18n="hero.lede">ถอดจอเสริมตอนเลิกงาน แล้วพรุ่งนี้ไอคอนกองรวมกันที่มุมซ้ายบน — ReDesk จำตำแหน่งไอคอนของคุณ แล้วคืนค่ากลับให้อัตโนมัติทุกครั้งที่การต่อจอเปลี่ยน</p>
+      <p class="lede"><strong>Save. Restore. Travel back in time.</strong></p>
+      <div class="cta">
+        <a class="btn lg" href="#download" data-i18n="hero.cta1">⬇ ดาวน์โหลดฟรี</a>
+        <a class="btn lg ghost" href="#features" data-i18n="hero.cta2">ดูคุณสมบัติทั้งหมด</a>
+      </div>
+      <p class="meta" data-i18n="hero.meta">ไฟล์เดียว · ไม่ต้องติดตั้ง · ไม่ต้องสิทธิ์ผู้ดูแลระบบ · ไม่เก็บข้อมูลออกนอกเครื่อง</p>
+    </div>
+    <div class="hero-img"><img src="assets/hero.jpg" alt="ReDesk"></div>
+  </div>
+</header>
+
+<section id="problem">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 data-i18n="prob.h">ปัญหาที่ Windows ไม่เคยแก้ให้</h2>
+      <p data-i18n="prob.sub">ทุกครั้งที่โครงสร้างจอเปลี่ยน Windows จะคำนวณตำแหน่งไอคอนใหม่ และมักคำนวณผิด</p>
+    </div>
+    <div class="prob">
+      <div>
+        <h3 data-i18n="prob.1h">ถอดจอเสริมออก</h3>
+        <p data-i18n="prob.1p">ไอคอนที่เคยอยู่จอที่ 2 ถูกยัดกลับมากองรวมกันบนจอหลัก ทับของเดิมจนหาอะไรไม่เจอ</p>
+      </div>
+      <div>
+        <h3 data-i18n="prob.2h">เปลี่ยนความละเอียด</h3>
+        <p data-i18n="prob.2p">ลดจาก 4K เหลือ 1080p แล้วไอคอนที่อยู่นอกกรอบใหม่ถูกดันมาเรียงใหม่หมด</p>
+      </div>
+      <div>
+        <h3 data-i18n="prob.3h">เปลี่ยน DPI Scaling</h3>
+        <p data-i18n="prob.3p">ปรับจาก 100% เป็น 150% ขนาดช่องกริดโตขึ้น ไอคอนเลื่อนตำแหน่งทั้งจอ</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 data-i18n="feat.h">คุณสมบัติ</h2>
+      <p data-i18n="feat.sub">ออกแบบมาสำหรับคนที่ต่อหลายจอและย้ายเครื่องบ่อย</p>
+    </div>
+    <div class="grid">
+
+      <div class="card">
+        <div class="ico" style="background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent-hot)">🖥</div>
+        <h3 data-i18n="f1.h">รองรับหลายมอนิเตอร์เต็มรูปแบบ</h3>
+        <p data-i18n="f1.p">จดจำโครงสร้างการต่อจอแบบละเอียด แล้วสร้าง profile แยกให้แต่ละรูปแบบโดยอัตโนมัติ</p>
+        <ul>
+          <li data-i18n-html="f1.a">ระบุจอด้วย <strong>EDID</strong> ไม่ใช่ลำดับพอร์ต สลับสาย HDMI แล้วไม่สับสน</li>
+          <li data-i18n="f1.b">เก็บความละเอียด · DPI · Refresh rate · การหมุนจอ · ตำแหน่งสัมพัทธ์</li>
+          <li data-i18n="f1.c">แยกแยะ Extend / Duplicate / จอเดียว ได้ถูกต้อง</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ico" style="background:color-mix(in srgb,var(--success) 16%,transparent);color:var(--success)">↺</div>
+        <h3 data-i18n="f2.h">สลับ Profile อัตโนมัติ</h3>
+        <p data-i18n="f2.p">ตรวจจับการเปลี่ยนจอแล้วคืนค่า layout ที่ตรงกับการต่อจอชุดนั้นให้ทันที</p>
+        <ul>
+          <li data-i18n-html="f2.a">จับ <code>WM_DISPLAYCHANGE</code> พร้อมหน่วงเวลาให้ระบบนิ่งก่อนตัดสินใจ</li>
+          <li data-i18n="f2.b">ถ้าไม่มี profile ตรงเป๊ะ จะหา profile ที่ใกล้เคียงที่สุดจากชุดจอเดิม</li>
+          <li data-i18n-html="f2.d"><strong>กู้ทันทีเมื่อ Explorer รีสตาร์ท</strong> — สาเหตุอันดับต้นๆ ที่ไอคอนเละ ซึ่งเครื่องมืออื่นไม่จับ</li>
+          <li data-i18n="f2.c">บันทึกอัตโนมัติก่อนเข้า Sleep และก่อน Shutdown</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ico" style="background:color-mix(in srgb,var(--purple) 16%,transparent);color:var(--purple)">⏱</div>
+        <h3 data-i18n="f3.h">ย้อนเวลาได้ทุกเมื่อ</h3>
+        <p data-i18n="f3.p">เก็บประวัติ snapshot ย้อนหลัง 30 ครั้ง กดย้อนกลับไปจุดไหนก็ได้ ลบทีละรายการหรือล้างทั้งหมดได้</p>
+        <ul>
+          <li data-i18n="f3.a">ดูตัวอย่างก่อนคืนค่าจริงเสมอ ไม่มีการเปลี่ยนแปลงแบบไม่ทันตั้งตัว</li>
+          <li data-i18n-html="f3.b">แต่ละ snapshot เก็บ <strong>ภาพหน้าจอจริง</strong> แยกตามจอไว้ให้ดูย้อนหลัง</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ico" style="background:color-mix(in srgb,var(--cyan) 16%,transparent);color:var(--cyan)">🗺</div>
+        <h3 data-i18n="f4.h">Mini-map ดูก่อนคืนค่า</h3>
+        <p data-i18n="f4.p">แผนที่ย่อส่วนตามสัดส่วนจริง แสดงว่าไอคอนไหนจะย้ายไปไหนก่อนกดยืนยัน</p>
+        <ul>
+          <li data-i18n="f4.a">แยกสีตามประเภทไฟล์ — โฟลเดอร์ ทางลัด เอกสาร รูปภาพ และอื่นๆ</li>
+          <li data-i18n="f4.b">เส้นโยงบอกทิศทางการย้ายของแต่ละไอคอน</li>
+          <li data-i18n-html="f4.c">มี <strong>กรอบเส้นประ</strong> บอกโซนที่ไอคอนใหม่จะไปอยู่</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ico" style="background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)">⚓</div>
+        <h3 data-i18n="f5.h">ไอคอนไม่หายแม้ถอดจอ</h3>
+        <p data-i18n-html="f5.p">ไอคอนจากจอที่ถูกถอดออกจะถูกพักไว้ในโซนที่กำหนด <strong>พร้อมจำว่าบ้านเดิมอยู่จอไหน</strong></p>
+        <ul>
+          <li data-i18n="f5.a">เสียบจอกลับเมื่อไหร่ ไอคอนกลับไปที่เดิมเอง</li>
+          <li data-i18n="f5.b">เลือกได้ว่าไอคอนใหม่ที่ยังไม่เคยบันทึกจะไปกองมุมไหน จอไหน</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ico" style="background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)">⚡</div>
+        <h3 data-i18n="f6.h">เบาจนลืมว่าเปิดอยู่</h3>
+        <p data-i18n="f6.p">ทำงานเงียบๆ ใน System Tray แบบ event-driven ล้วน ไม่มี polling loop</p>
+        <ul>
+          <li data-i18n-html="f6.a"><strong>ใช้แรม 20–40 MB</strong> ตอนย่อลง tray</li>
+          <li data-i18n-html="f6.b"><strong>CPU 0%</strong> ขณะไม่มีอะไรเปลี่ยนแปลง</li>
+          <li data-i18n="f6.c">ไฟล์เดียว ไม่ต้องติดตั้ง ไม่ต้องลง runtime เพิ่ม</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ico" style="background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent-hot)">🌗</div>
+        <h3 data-i18n="f7.h">ไทย / อังกฤษ · มืด / สว่าง</h3>
+        <p data-i18n="f7.p">สลับภาษาและธีมได้ทันทีในคลิกเดียว จำค่าไว้ให้ครั้งถัดไป</p>
+        <ul>
+          <li data-i18n="f7.a">แปลครบทั้งหน้าต่าง รวมถึงเมนู tray</li>
+          <li data-i18n="f7.b">Title bar เปลี่ยนตามธีมด้วย ไม่ใช่แค่พื้นที่ในหน้าต่าง</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ico" style="background:color-mix(in srgb,var(--success) 16%,transparent);color:var(--success)">📦</div>
+        <h3 data-i18n="f8.h">ย้ายเครื่องได้</h3>
+        <p data-i18n="f8.p">Export / Import profile เป็นไฟล์ JSON อ่านออกด้วยตาเปล่า</p>
+        <ul>
+          <li data-i18n="f8.a">สำรองไว้ หรือส่งให้เครื่องอื่นใช้ layout เดียวกัน</li>
+          <li data-i18n-html="f8.c"><strong>ซิงก์อัตโนมัติ</strong> ผ่านโฟลเดอร์ OneDrive / Dropbox / เน็ตเวิร์กไดรฟ์</li>
+          <li data-i18n="f8.b">ข้อมูลทั้งหมดอยู่ในเครื่องคุณ ไม่มีเซิร์ฟเวอร์ ไม่ต้องสมัครบัญชี</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ico" style="background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)">📌</div>
+        <h3 data-i18n="f9.h">โซนอัตโนมัติและการปักหมุด</h3>
+        <p data-i18n="f9.p">ไม่ใช่แค่คืนตำแหน่ง แต่จัดระเบียบให้ด้วย</p>
+        <ul>
+          <li data-i18n-html="f9.a">ตั้ง<strong>โซนมีชื่อพร้อมกฎ</strong> — ไฟล์ประเภทไหนหรือชื่อขึ้นต้นอะไร ไปโซนไหน</li>
+          <li data-i18n="f9.b">ไอคอนใหม่ถูกจัดเข้าโซนที่ตรงกฎเอง ไม่ใช่กองรวมมุมเดียว</li>
+          <li data-i18n-html="f9.c"><strong>ปักหมุด</strong>ไอคอนให้อยู่ที่เดิมเสมอ ชนะทุกการคืนค่า</li>
+          <li data-i18n="f9.d">ลากกำหนดพื้นที่โซนบนแผนผังได้โดยตรง</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ico" style="background:color-mix(in srgb,var(--purple) 16%,transparent);color:var(--purple)">🧠</div>
+        <h3 data-i18n="f10.h">เรียนรู้จากพฤติกรรมคุณ</h3>
+        <p data-i18n="f10.p">ระบบดูประวัติแล้วหาไอคอนที่คุณต้องลากกลับที่เดิมซ้ำๆ แล้วเสนอให้ปักหมุด</p>
+        <ul>
+          <li data-i18n="f10.a">สัญญาณคือ "เร่ร่อนแต่กลับบ้านเสมอ" ไม่ใช่ "ไม่เคยขยับ" เพราะตัวที่ไม่เคยขยับไม่ต้องช่วยอะไร</li>
+          <li data-i18n="f10.b">บอกด้วยว่ามั่นใจแค่ไหน กลับมาที่เดิมกี่ครั้งจากทั้งหมดกี่ครั้ง</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ico" style="background:color-mix(in srgb,var(--cyan) 16%,transparent);color:var(--cyan)">📊</div>
+        <h3 data-i18n="f11.h">รู้ว่าเดสก์ท็อปรกแค่ไหน</h3>
+        <p data-i18n="f11.p">ใช้ประวัติที่เก็บอยู่แล้วมาตอบคำถามที่ไม่มีเครื่องมือไหนตอบได้</p>
+        <ul>
+          <li data-i18n="f11.a">จำนวนไอคอนเพิ่มหรือลดกี่ตัวใน 30 วัน พร้อมกราฟย้อนหลัง</li>
+          <li data-i18n="f11.b">ไฟล์ที่ไม่ได้แก้ไขเกิน 90 วัน เรียงจากค้างนานที่สุด</li>
+          <li data-i18n="f11.c">เปรียบเทียบ snapshot สองอันว่าอะไรเพิ่ม หาย หรือย้าย พร้อมเส้นโยงบนแผนที่</li>
+          <li data-i18n="f11.d">ไทม์ไลน์ภาพหน้าจอย้อนหลัง ดูเดสก์ท็อปเปลี่ยนไปตามเวลา</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ico" style="background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)">🎬</div>
+        <h3 data-i18n="f12.h">ปรับตามสถานการณ์</h3>
+        <p data-i18n="f12.p">สลับ layout ตามที่คุณอยู่และสิ่งที่คุณกำลังทำ ไม่ใช่แค่ตามจอที่ต่อ</p>
+        <ul>
+          <li data-i18n="f12.a">ตั้งกฎตามชื่อ Wi-Fi · ช่วงเวลา · โปรแกรมที่เปิดอยู่</li>
+          <li data-i18n-html="f12.b"><strong>โหมดนำเสนอ</strong> ซ่อนไอคอนทั้งหมดในคลิกเดียว และเข้าเองได้เมื่อต่อโปรเจกเตอร์</li>
+          <li data-i18n="f12.c">ใช้คำสั่งของ shell เอง ไม่ย้ายไอคอน จึงไม่มีทางทำ layout หาย</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ico" style="background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent-hot)">🎚</div>
+        <h3 data-i18n="f13.h">ง่ายหรือลึก เลือกได้</h3>
+        <p data-i18n="f13.p">เปิดมาเป็นโหมดใช้งานง่าย เห็นแค่สิ่งที่ต้องใช้จริง กดสวิตช์เดียวเปิดเครื่องมือทั้งหมด</p>
+        <ul>
+          <li data-i18n="f13.a">โหมดง่าย: บันทึก คืนค่า และประวัติ เท่านั้น</li>
+          <li data-i18n="f13.b">โหมดขั้นสูง: โซน หมุด ไทม์ไลน์ วิเคราะห์ กฎอัตโนมัติ และซิงก์</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="shots">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 data-i18n="shot.h">หน้าตาโปรแกรม</h2>
+      <p data-i18n="shot.sub">ภาพจริงจากตัวโปรแกรมที่ทำงานอยู่ ไม่ใช่ภาพจำลอง</p>
+    </div>
+    <div class="shots">
+      <figure>
+        <img src="assets/shot-dark.png" alt="ReDesk dark theme">
+        <figcaption data-i18n="shot.1">ธีมมืด · ภาษาไทย — mini-map แยกสีตามประเภทไฟล์ พร้อมสถานะระบบและประวัติ snapshot</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/shot-light.png" alt="ReDesk light theme">
+        <figcaption data-i18n="shot.2">ธีมสว่าง · ภาษาอังกฤษ — สลับได้ทันทีจากสวิตช์มุมขวาบน</figcaption>
+      </figure>
+      <figure class="full">
+        <img src="assets/shot-desktop-capture.jpg" alt="Desktop capture">
+        <figcaption data-i18n-html="shot.3">ภาพหน้าจอที่เก็บตอนกดบันทึก — จับ <strong>เดสก์ท็อปจริงทั้งสองจอ</strong> โดยไม่มีหน้าต่างอื่นมาบัง แม้ตอนนั้นจะเปิดโปรแกรมอะไรค้างไว้ก็ตาม</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head"><h2 data-i18n="how.h">ใช้งานใน 3 ขั้นตอน</h2></div>
+    <div class="steps">
+      <div class="step">
+        <h3 data-i18n="how.1h">จัดไอคอนให้เรียบร้อย</h3>
+        <p data-i18n-html="how.1p">จัดวางไอคอนบนเดสก์ท็อปตามที่ชอบ แล้วเปิด ReDesk กด <strong>บันทึก Layout</strong> ครั้งเดียว</p>
+      </div>
+      <div class="step">
+        <h3 data-i18n="how.2h">เปิดคืนค่าอัตโนมัติ</h3>
+        <p data-i18n-html="how.2p">ติ๊ก <strong>คืนค่าอัตโนมัติเมื่อจอเปลี่ยน</strong> และ <strong>เปิดโปรแกรมพร้อม Windows</strong> จากนั้นปล่อยให้มันทำงานเอง</p>
+      </div>
+      <div class="step">
+        <h3 data-i18n="how.3h">ลืมมันไปได้เลย</h3>
+        <p data-i18n="how.3p">ถอด-เสียบจอ เปลี่ยนความละเอียด หรือปรับ scaling ได้ตามใจ ไอคอนกลับที่เดิมเองทุกครั้ง</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="specs">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 data-i18n="spec.h">ข้อมูลทางเทคนิค</h2>
+      <p data-i18n="spec.sub">สำหรับคนที่อยากรู้ว่าข้างในทำงานยังไง</p>
+    </div>
+    <table>
+      <tr><th data-i18n="spec.os">ระบบที่รองรับ</th><td data-i18n="spec.osv">Windows 10 (1703 ขึ้นไป) และ Windows 11 · 64-bit</td></tr>
+      <tr><th data-i18n="spec.req">สิ่งที่ต้องมี</th><td data-i18n="spec.reqv">ไม่มี — ไฟล์หลักรวมทุกอย่างไว้ในตัวแล้ว (ไฟล์ทางเลือกขนาดเล็กต้องมี .NET 10 Desktop Runtime)</td></tr>
+      <tr><th data-i18n="spec.size">ขนาดไฟล์</th><td data-i18n-html="spec.sizev">ไฟล์เดียว <span class="tag">66 MB</span> รวม runtime · หรือแบบเล็ก <span class="tag">1.9 MB</span> สำหรับเครื่องที่มี .NET 10 อยู่แล้ว</td></tr>
+      <tr><th data-i18n="spec.mem">หน่วยความจำ</th><td data-i18n-html="spec.memv"><span class="tag">20–40 MB</span> ขณะย่อลง System Tray</td></tr>
+      <tr><th data-i18n="spec.cpu">การใช้ CPU</th><td data-i18n-html="spec.cpuv"><span class="tag">0%</span> ขณะ idle — เป็น event-driven ไม่มี polling</td></tr>
+      <tr><th data-i18n="spec.api">วิธีอ่าน/เขียนตำแหน่ง</th><td data-i18n-html="spec.apiv">Shell COM <code>IFolderView</code> ซึ่งเป็น API สาธารณะของ Windows ไม่ใช้การ inject เข้า explorer.exe</td></tr>
+      <tr><th data-i18n="spec.id">การระบุตัวจอ</th><td data-i18n="spec.idv">EDID (รหัสผู้ผลิต + รหัสรุ่น) จึงไม่สับสนเมื่อสลับพอร์ต</td></tr>
+      <tr><th>DPI</th><td data-i18n="spec.dpiv">Per-Monitor-V2 aware ทำงานในพิกัดเดียวกับ explorer.exe จึงไม่เพี้ยนเมื่อ scaling ต่างกันแต่ละจอ</td></tr>
+      <tr><th data-i18n="spec.priv">สิทธิ์ที่ใช้</th><td data-i18n-html="spec.privv">ผู้ใช้ทั่วไป — <strong>ห้ามรันแบบ Run as administrator</strong> เพราะ UAC จะบล็อกการเชื่อมต่อกับ explorer.exe</td></tr>
+      <tr><th data-i18n="spec.store">ที่เก็บข้อมูล</th><td data-i18n-html="spec.storev"><code>%LOCALAPPDATA%\ReDesk\</code> เป็นไฟล์ JSON และ JPEG ทั้งหมดอยู่ในเครื่อง</td></tr>
+      <tr><th data-i18n="spec.note">ข้อควรทราบ</th><td data-i18n-html="spec.notev"><span class="tag warn">ต้องปิด Auto arrange icons</span> ของ Windows ก่อนใช้งาน ตัวโปรแกรมจะแจ้งเตือนให้</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head"><h2 data-i18n="faq.h">คำถามที่พบบ่อย</h2></div>
+
+    <details open>
+      <summary data-i18n="faq.1q">ทำไมต้องปิด "Auto arrange icons" ของ Windows</summary>
+      <p data-i18n="faq.1a">ถ้าเปิดออปชันนี้ไว้ Windows จะบังคับเรียงไอคอนใหม่ตลอดเวลา และทิ้งตำแหน่งที่โปรแกรมไหนก็ตามเขียนลงไป ไม่ใช่แค่ ReDesk — ทำให้การคืนค่าไม่มีผล ตัวโปรแกรมจะตรวจให้อัตโนมัติและเตือนถ้ายังเปิดอยู่ วิธีปิด: คลิกขวาบนเดสก์ท็อป → View → เอาติ๊ก "Auto arrange icons" ออก</p>
+    </details>
+
+    <details>
+      <summary data-i18n="faq.2q">ทำไมห้ามรันแบบ Run as administrator</summary>
+      <p data-i18n-html="faq.2a">ReDesk ต้องคุยกับ explorer.exe ผ่าน COM ซึ่ง explorer รันที่ระดับสิทธิ์ปานกลาง UAC ห้ามโปรเซสสิทธิ์สูงกว่าเชื่อมต่อกับ COM object ของโปรเซสสิทธิ์ต่ำกว่า การรันแบบผู้ดูแลระบบจึงทำให้โปรแกรม <strong>ใช้งานไม่ได้</strong> ไม่ใช่ทำงานดีขึ้น</p>
+    </details>
+
+    <details>
+      <summary data-i18n="faq.3q">ปลอดภัยไหม มีการส่งข้อมูลออกนอกเครื่องหรือเปล่า</summary>
+      <p data-i18n-html="faq.3a">ไม่มีการเชื่อมต่อเครือข่ายใดๆ ข้อมูลทั้งหมด (ตำแหน่งไอคอน ภาพหน้าจอ การตั้งค่า) เก็บอยู่ใน <code>%LOCALAPPDATA%\ReDesk\</code> เป็นไฟล์ JSON และ JPEG ที่เปิดอ่านตรวจสอบเองได้ และ ReDesk ใช้ API สาธารณะของ Windows ไม่ได้ inject โค้ดเข้าโปรเซสอื่น</p>
+    </details>
+
+    <details>
+      <summary data-i18n="faq.4q">ภาพหน้าจอที่เก็บไว้จะติดหน้าต่างที่เปิดค้างไว้ไหม</summary>
+      <p data-i18n="faq.4a">ไม่ติด ReDesk สั่งให้หน้าต่างเดสก์ท็อปวาดตัวเองลงบัฟเฟอร์นอกจอโดยตรง จึงได้ภาพวอลเปเปอร์กับไอคอนล้วนๆ เสมอ ต่อให้ตอนนั้นเปิดโปรแกรมเต็มจอค้างไว้ก็ตาม และไม่มีการกระพริบหรือย่อหน้าต่างใดๆ</p>
+    </details>
+
+    <details>
+      <summary data-i18n="faq.5q">ต่อ 3 จอขึ้นไปได้ไหม</summary>
+      <p data-i18n="faq.5a">ได้ ไม่จำกัดจำนวนจอ ทุกจอจะถูกบันทึกตำแหน่งและเก็บภาพหน้าจอแยกกัน หน้าต่างดูภาพจะแยกเป็นแท็บต่อจอเพื่อให้ดูได้ชัดเจน</p>
+    </details>
+
+    <details>
+      <summary data-i18n="faq.6q">ถ้าลบไฟล์บนเดสก์ท็อปไปแล้ว snapshot เก่าจะพังไหม</summary>
+      <p data-i18n="faq.6a">ไม่พัง ReDesk อ้างอิงไอคอนด้วยเส้นทางไฟล์จริง ไม่ใช่ลำดับที่ ไฟล์ที่ไม่มีอยู่แล้วจะถูกข้ามไปเงียบๆ และรายงานจำนวนให้ทราบ ส่วนไฟล์ใหม่ที่ไม่มีใน snapshot จะถูกจัดไปไว้ในโซนที่คุณกำหนด ไม่ทับของเดิม</p>
+    </details>
+  </div>
+</section>
+
+<section id="download">
+  <div class="wrap">
+    <div class="dl">
+      <img src="assets/logo.png" alt="ReDesk">
+      <h2 data-i18n="dl.h">เริ่มใช้งาน ReDesk</h2>
+      <p data-i18n="dl.p">ไฟล์เดียว ไม่ต้องติดตั้ง ไม่ต้องสิทธิ์ผู้ดูแลระบบ ลบทิ้งเมื่อไหร่ก็ได้โดยไม่ทิ้งร่องรอยในระบบ</p>
+
+      <!-- Stays hidden until COUNTER.mode is configured; see the script at the bottom. -->
+      <div class="counter" id="counter" hidden>
+        <span class="counter-num" id="counterNum">—</span>
+        <span class="counter-label" data-i18n="dl.counter">ดาวน์โหลด</span>
+      </div>
+      <div class="cta" style="justify-content:center">
+        <!--
+          /releases/latest/download/<asset> always resolves to the newest release, so the
+          asset names carry no version number and this link never has to be edited again.
+        -->
+        <a class="btn lg" href="https://github.com/ziggaza/redesk/releases/latest/download/ReDesk-win-x64.exe"
+           data-download data-i18n="dl.cta1">⬇ ดาวน์โหลดสำหรับ Windows 64-bit</a>
+        <a class="btn lg ghost" href="#specs" data-i18n="dl.cta2">ดูข้อกำหนดระบบ</a>
+      </div>
+
+      <p class="dl-release">
+        <span id="relVersion">v1.0.0</span>
+        <span class="dot">·</span>
+        <span id="relSize">66 MB</span>
+        <span class="dot">·</span>
+        <span data-i18n="dl.selfcontained">รวม .NET runtime มาแล้ว ไม่ต้องติดตั้งอะไรเพิ่ม</span>
+      </p>
+
+      <p class="meta dl-alt">
+        <a href="https://github.com/ziggaza/redesk/releases/latest/download/ReDesk-win-x64-net10.exe"
+           data-i18n="dl.alt">มี .NET 10 อยู่แล้ว? โหลดไฟล์เล็ก 1.9 MB</a>
+        <span class="dot">·</span>
+        <a href="https://github.com/ziggaza/redesk/releases" data-i18n="dl.notes">บันทึกการเปลี่ยนแปลงทุกเวอร์ชัน</a>
+      </p>
+
+      <p class="meta" style="margin-top:14px" data-i18n="dl.meta">Windows อาจขึ้นเตือน SmartScreen เพราะไฟล์ยังไม่ได้เซ็นใบรับรอง — กด “ข้อมูลเพิ่มเติม” แล้ว “เรียกใช้ต่อไป” ได้เลย</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div>
+      <div style="color:var(--text);font-weight:600;margin-bottom:5px">ReDesk</div>
+      <span data-i18n="foot.tag">Desktop Icon Layout Manager · สำหรับ Windows 10 / 11</span>
+    </div>
+    <div class="foot-right">
+      <span>Powered by <strong>ZigGaZa Studio</strong></span>
+      <img src="assets/ziggaza.png" alt="ZigGaZa Studio">
+    </div>
+  </div>
+</footer>
+
+<script>
+// English copy. Thai is the markup default, so only the EN side is listed; switching back
+// restores the original text captured on first run.
+const EN = {
+  "brand.sub":"Desktop Icon Layout Manager",
+  "nav.features":"Features","nav.how":"How it works","nav.specs":"Specs","nav.faq":"FAQ","nav.download":"Download",
+
+  "hero.badge":"◆ Free · for Windows 10 / 11",
+  "hero.title":"Your desktop icons<br><em>will stop scattering</em>",
+  "hero.lede":"Unplug the second monitor at the end of the day and tomorrow every icon is piled in the top-left corner. ReDesk remembers where your icons belong and puts them back automatically whenever the display setup changes.",
+  "hero.cta1":"⬇ Download free","hero.cta2":"See all features",
+  "hero.meta":"One file · no installer · no admin rights · nothing leaves your machine",
+
+  "prob.h":"The problem Windows never fixed",
+  "prob.sub":"Every time the display layout changes Windows recalculates icon positions, and usually gets it wrong",
+  "prob.1h":"Unplugging a monitor",
+  "prob.1p":"Icons that lived on the second screen get crammed onto the primary one, stacked on top of what was already there",
+  "prob.2h":"Changing resolution",
+  "prob.2p":"Drop from 4K to 1080p and everything outside the new bounds gets rearranged for you",
+  "prob.3h":"Changing DPI scaling",
+  "prob.3p":"Go from 100% to 150% and the grid cells grow, shifting every icon on the screen",
+
+  "feat.h":"Features","feat.sub":"Built for people who run several monitors and move between setups",
+  "f1.h":"Real multi-monitor support",
+  "f1.p":"Records the display layout in detail and keeps a separate profile per arrangement, automatically",
+  "f1.a":"Identifies monitors by <strong>EDID</strong>, not port order, so swapping HDMI cables changes nothing",
+  "f1.b":"Stores resolution · DPI · refresh rate · rotation · relative position",
+  "f1.c":"Tells Extend, Duplicate and single-screen apart correctly",
+
+  "f2.h":"Automatic profile switching",
+  "f2.p":"Detects the display change and restores the layout that matches that exact arrangement",
+  "f2.a":"Listens for <code>WM_DISPLAYCHANGE</code> and waits for the display stack to settle before acting",
+  "f2.b":"With no exact profile it falls back to the closest match on the same set of monitors",
+  "f2.c":"Auto-saves before sleep and before shutdown",
+
+  "f3.h":"Rewind any time",
+  "f3.p":"Keeps the last 30 snapshots so you can jump back to any of them. Delete them one at a time or clear the lot.",
+  "f3.a":"Always previews before it touches anything, so nothing changes unexpectedly",
+  "f3.b":"Every snapshot keeps a <strong>real screenshot</strong> of each monitor to look back at",
+
+  "f4.h":"Mini-map preview",
+  "f4.p":"A to-scale map of the whole desktop showing exactly which icons move where, before you commit",
+  "f4.a":"Colour-coded by file type — folders, shortcuts, documents, images and more",
+  "f4.b":"Leader lines show the direction each icon travels",
+  "f4.c":"A <strong>dashed box</strong> marks where brand new icons will land",
+
+  "f5.h":"Nothing lost when a monitor goes",
+  "f5.p":"Icons from a disconnected screen are parked in the zone you choose, <strong>remembering which monitor they came from</strong>",
+  "f5.a":"Plug the monitor back in and they return home on their own",
+  "f5.b":"Choose which corner and which monitor new, unsaved icons go to",
+
+  "f6.h":"Light enough to forget",
+  "f6.p":"Sits quietly in the system tray, purely event-driven, with no polling loop",
+  "f6.a":"<strong>20–40 MB of RAM</strong> while minimised to the tray",
+  "f6.b":"<strong>0% CPU</strong> when nothing is changing",
+  "f6.c":"A single file, no installer, no runtime to install",
+
+  "f7.h":"Thai / English · dark / light",
+  "f7.p":"Switch language and theme in one click; both are remembered",
+  "f7.a":"Fully translated, tray menu included",
+  "f7.b":"The title bar follows the theme too, not just the window contents",
+
+  "f2.d":"<strong>Recovers the moment explorer.exe restarts</strong> — the most common cause of scrambled icons, and one other tools miss",
+
+  "f8.h":"Portable between machines",
+  "f8.p":"Export and import profiles as plain JSON you can read yourself",
+  "f8.a":"Back them up, or hand the same layout to another machine",
+  "f8.c":"<strong>Syncs automatically</strong> through a OneDrive, Dropbox or network folder",
+  "f8.b":"Everything stays on your computer; no server, no account",
+
+  "f9.h":"Automatic zones and pinning",
+  "f9.p":"Not just putting icons back — actually keeping them organised",
+  "f9.a":"Define <strong>named zones with rules</strong>: which file types, or which name patterns, belong where",
+  "f9.b":"New icons are filed into the zone that matches, instead of piling up in one corner",
+  "f9.c":"<strong>Pin</strong> an icon and it stays put, outranking every restore",
+  "f9.d":"Drag a zone's area straight onto the map",
+
+  "f10.h":"Learns from how you work",
+  "f10.p":"Watches the history for icons you keep dragging back to the same spot, then offers to pin them",
+  "f10.a":"The signal is \"wanders but always comes home\", not \"never moves\" — an icon that never moves needs no help",
+  "f10.b":"Shows its confidence: how many times out of how many it returned to the same place",
+
+  "f11.h":"See how cluttered it really is",
+  "f11.p":"Turns the history it already keeps into answers no other tool can give",
+  "f11.a":"How many icons you gained or lost in 30 days, with a trend line",
+  "f11.b":"Files untouched for over 90 days, longest-idle first",
+  "f11.c":"Compare two snapshots — added, removed, moved — with leader lines on the map",
+  "f11.d":"A screenshot timeline showing the desktop change over time",
+
+  "f12.h":"Adapts to the situation",
+  "f12.p":"Switches layout based on where you are and what you are doing, not just what is plugged in",
+  "f12.a":"Rules on Wi-Fi name · time of day · which app is running",
+  "f12.b":"<strong>Presentation mode</strong> hides every icon in one click, and can trigger itself when a projector is connected",
+  "f12.c":"Uses the shell's own command rather than moving icons, so a layout can never be lost to it",
+
+  "f13.h":"Simple or deep, your choice",
+  "f13.p":"Opens in simple mode showing only what you need. One switch reveals every tool.",
+  "f13.a":"Simple: save, restore and history",
+  "f13.b":"Advanced: zones, pins, timeline, insights, automation rules and sync",
+
+  "shot.h":"What it looks like","shot.sub":"Real captures from the running application, not mock-ups",
+  "shot.1":"Dark theme · Thai — mini-map colour-coded by file type, with system status and snapshot history",
+  "shot.2":"Light theme · English — switch instantly from the toggles in the top right",
+  "shot.3":"A screenshot taken at save time — the <strong>real desktop across both monitors</strong>, with no other windows in the way, even though applications were open at the time",
+
+  "how.h":"Three steps to set up",
+  "how.1h":"Arrange your icons",
+  "how.1p":"Put the icons where you want them, open ReDesk and press <strong>Save layout</strong> once",
+  "how.2h":"Turn on auto-restore",
+  "how.2p":"Tick <strong>Auto-restore when displays change</strong> and <strong>Start with Windows</strong>, then leave it alone",
+  "how.3h":"Forget about it",
+  "how.3p":"Unplug monitors, change resolution, adjust scaling — the icons come back every time",
+
+  "spec.h":"Technical details","spec.sub":"For anyone who wants to know how it works underneath",
+  "spec.os":"Supported systems","spec.osv":"Windows 10 (1703 or later) and Windows 11 · 64-bit",
+  "spec.req":"Requires",
+  "spec.reqv":"Nothing — the main file has everything built in (the optional small build needs the .NET 10 Desktop Runtime)",
+  "spec.size":"File size","spec.sizev":"A single <span class=\"tag\">66 MB</span> file with the runtime inside · or a <span class=\"tag\">1.9 MB</span> build for machines that already have .NET 10",
+  "spec.mem":"Memory","spec.memv":"<span class=\"tag\">20–40 MB</span> while minimised to the system tray",
+  "spec.cpu":"CPU usage","spec.cpuv":"<span class=\"tag\">0%</span> when idle — event-driven, no polling",
+  "spec.api":"How positions are read/written","spec.apiv":"Shell COM <code>IFolderView</code>, a public Windows API. No injection into explorer.exe.",
+  "spec.id":"Monitor identity","spec.idv":"EDID (vendor + product code), so swapping ports changes nothing",
+  "spec.dpiv":"Per-Monitor-V2 aware, working in the same coordinate space as explorer.exe, so mixed scaling does not shift anything",
+  "spec.priv":"Privileges","spec.privv":"Standard user — <strong>do not Run as administrator</strong>, UAC blocks the connection to explorer.exe",
+  "spec.store":"Data location","spec.storev":"<code>%LOCALAPPDATA%\\ReDesk\\</code> as JSON and JPEG, entirely on your machine",
+  "spec.note":"Note","spec.notev":"<span class=\"tag warn\">Auto arrange icons must be off</span> in Windows before use; the app checks and warns you",
+
+  "faq.h":"Frequently asked questions",
+  "faq.1q":"Why must I turn off Windows \"Auto arrange icons\"?",
+  "faq.1a":"With that option on, Windows constantly re-sorts the icons and discards any position written by any program, not just ReDesk, so restoring has no effect. The app checks automatically and warns you. To turn it off: right-click the desktop → View → untick \"Auto arrange icons\".",
+  "faq.2q":"Why can I not Run as administrator?",
+  "faq.2a":"ReDesk talks to explorer.exe over COM, and explorer runs at medium integrity. UAC forbids a higher-privileged process from binding to a lower-privileged one's COM objects, so running as administrator makes the app <strong>stop working</strong> rather than work better.",
+  "faq.3q":"Is it safe? Does anything leave my machine?",
+  "faq.3a":"There is no network code at all. Everything — icon positions, screenshots, settings — lives in <code>%LOCALAPPDATA%\\ReDesk\\</code> as JSON and JPEG you can open and inspect. ReDesk uses public Windows APIs and does not inject code into other processes.",
+  "faq.4q":"Will the saved screenshots include whatever windows I had open?",
+  "faq.4a":"No. ReDesk asks the desktop window to render itself into an off-screen buffer, so you always get wallpaper and icons only, even with an application maximised at the time. Nothing flickers and no window is minimised.",
+  "faq.5q":"Does it handle three or more monitors?",
+  "faq.5a":"Yes, with no limit on monitor count. Every monitor gets its positions saved and its own screenshot, and the viewer puts each one on its own tab so they stay readable.",
+  "faq.6q":"If I delete a file from the desktop, does the old snapshot break?",
+  "faq.6a":"No. ReDesk identifies icons by their real file path, not by list position. Entries that no longer exist are skipped quietly and reported as a count. New files that were not in the snapshot go to the zone you chose, without covering anything.",
+
+  "dl.h":"Get started with ReDesk",
+  "dl.p":"One file, no installer, no admin rights. Delete it whenever you like and it leaves nothing behind.",
+  "dl.cta1":"⬇ Download for Windows 64-bit","dl.cta2":"System requirements","dl.counter":"downloads",
+  "dl.selfcontained":"the .NET runtime is bundled — nothing else to install",
+  "dl.alt":"Already have .NET 10? Get the 1.9 MB build",
+  "dl.notes":"Release notes for every version",
+  "dl.meta":"Windows may show a SmartScreen warning because the file is not code-signed yet — click “More info”, then “Run anyway”",
+
+  "foot.tag":"Desktop Icon Layout Manager · for Windows 10 / 11"
+};
+
+/* ---------------------------------------------------------------------------
+   Download counter.
+
+   A page served from static hosting cannot count its own downloads: there is no
+   server-side code to increment anything. So this reads a number from somewhere
+   else, and until one is configured the whole block stays hidden rather than
+   showing a placeholder or an invented figure to visitors.
+
+   Pick one:
+
+   mode:"github"  Sums download_count across the assets of every published
+                  release. Accurate and needs no third party, but the release has
+                  to be public. Set githubRepo to "owner/repo".
+
+   mode:"api"     Any endpoint that returns a number, or JSON containing one.
+                  Set readUrl, and hitUrl if the service needs a separate call to
+                  register a download. Works with a hit-counter service or a small
+                  function of your own.
+
+   mode:"none"    Counter hidden. This is the default.
+--------------------------------------------------------------------------- */
+const COUNTER = {
+  mode: "github",
+  githubRepo: "ziggaza/redesk",
+  readUrl: "",                    // e.g. "https://api.example.com/redesk/downloads"
+  hitUrl: "",                     // called on click; leave empty if readUrl also increments
+  jsonPath: "value",              // property to read when the response is JSON
+};
+
+/* The primary asset. Named without a version so /releases/latest/download/ keeps working
+   forever; the version and size shown on the page come from the API instead. */
+const PRIMARY_ASSET = "ReDesk-win-x64.exe";
+
+async function initCounter(){
+  const box = document.getElementById("counter");
+  const num = document.getElementById("counterNum");
+  if (!box || COUNTER.mode === "none") return;
+
+  box.hidden = false;
+  box.classList.add("loading");
+
+  try {
+    let total = null;
+
+    if (COUNTER.mode === "github" && COUNTER.githubRepo) {
+      const res = await fetch(`https://api.github.com/repos/${COUNTER.githubRepo}/releases`,
+                              { headers:{ Accept:"application/vnd.github+json" } });
+      if (!res.ok) throw new Error("github " + res.status);
+      const releases = await res.json();
+      total = releases.reduce((sum, r) =>
+        sum + (r.assets || []).reduce((a, x) => a + (x.download_count || 0), 0), 0);
+
+      // Same response already describes the newest build, so the version and size on the
+      // page follow the release automatically. Failure here must not break the counter.
+      showLatestRelease(releases);
+    }
+
+    if (COUNTER.mode === "api" && COUNTER.readUrl) {
+      const res = await fetch(COUNTER.readUrl);
+      if (!res.ok) throw new Error("api " + res.status);
+      const body = await res.text();
+      const parsed = Number(body);
+      total = Number.isFinite(parsed) ? parsed : Number(JSON.parse(body)?.[COUNTER.jsonPath]);
+    }
+
+    if (!Number.isFinite(total)) throw new Error("no usable count");
+
+    // Zero is a real answer on release day, but "0 downloads" reads as a broken widget.
+    // Show nothing until there is something worth showing.
+    if (total < 1) throw new Error("nothing to show yet");
+
+    box.classList.remove("loading");
+    num.textContent = total.toLocaleString(root.lang === "en" ? "en-US" : "th-TH");
+  } catch (err) {
+    // A dead counter must not look like zero downloads. Hide it and move on.
+    console.warn("download counter unavailable:", err);
+    box.hidden = true;
+  }
+}
+
+/**
+ * Replaces the hardcoded version and size under the download button with whatever the
+ * newest published release actually contains. The markup already holds correct values for
+ * the current release, so if the API is unreachable or rate-limited the page still reads
+ * right — this only ever improves on it.
+ */
+function showLatestRelease(releases){
+  try {
+    const latest = (releases || []).find(r => !r.draft && !r.prerelease);
+    if (!latest) return;
+
+    const version = document.getElementById("relVersion");
+    if (version && latest.tag_name) version.textContent = latest.tag_name;
+
+    const asset = (latest.assets || []).find(a => a.name === PRIMARY_ASSET);
+    const size = document.getElementById("relSize");
+    if (size && asset?.size) {
+      const mb = asset.size / 1e6;                       // MB as the browser reports it
+      size.textContent = (mb >= 10 ? Math.round(mb) : mb.toFixed(1)) + " MB";
+    }
+  } catch (err) {
+    console.warn("release details unavailable:", err);
+  }
+}
+
+// Register the click before navigation; keepalive lets it survive the page leaving.
+document.querySelector("[data-download]")?.addEventListener("click", () => {
+  if (COUNTER.mode === "api" && COUNTER.hitUrl) {
+    fetch(COUNTER.hitUrl, { method:"POST", keepalive:true }).catch(() => {});
+  }
+});
+
+const root = document.documentElement;
+const THAI = new Map();   // original markup, captured once so switching back is lossless
+
+document.querySelectorAll("[data-i18n],[data-i18n-html]").forEach(el => {
+  const key = el.dataset.i18n || el.dataset.i18nHtml;
+  THAI.set(key, el.dataset.i18nHtml ? el.innerHTML : el.textContent);
+});
+
+function applyLang(lang){
+  root.lang = lang;
+  document.querySelectorAll("[data-i18n],[data-i18n-html]").forEach(el => {
+    const html = !!el.dataset.i18nHtml;
+    const key = el.dataset.i18n || el.dataset.i18nHtml;
+    const value = lang === "en" ? EN[key] : THAI.get(key);
+    if (value === undefined) return;          // untranslated key: leave the Thai in place
+    if (html) el.innerHTML = value; else el.textContent = value;
+  });
+  localStorage.setItem("redesk.lang", lang);
+}
+
+function applyTheme(theme){
+  root.dataset.theme = theme;
+  document.getElementById("knobGlyph").textContent = theme === "light" ? "☀" : "🌙";
+  localStorage.setItem("redesk.theme", theme);
+}
+
+document.getElementById("swLang").addEventListener("click", () =>
+  applyLang(root.lang === "en" ? "th" : "en"));
+
+document.getElementById("swTheme").addEventListener("click", () =>
+  applyTheme(root.dataset.theme === "light" ? "dark" : "light"));
+
+// Saved choice wins; otherwise follow the OS, defaulting to dark like the app does.
+const savedTheme = localStorage.getItem("redesk.theme");
+applyTheme(savedTheme || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"));
+applyLang(localStorage.getItem("redesk.lang") || "th");
+
+// After applyLang so the number is grouped for the language actually on screen.
+initCounter();
+</script>
+
+</body>
+</html>
