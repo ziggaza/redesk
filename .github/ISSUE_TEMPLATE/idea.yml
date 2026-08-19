@@ -1,0 +1,30 @@
+name: 💡 เสนอไอเดีย / Suggest an idea
+description: อยากให้ ReDesk ทำอะไรได้อีก · Something you wish ReDesk could do
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        เขียนภาษาไทยหรืออังกฤษก็ได้ · Thai or English is fine.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: ตอนนี้ติดปัญหาอะไร / What is awkward today
+      description: เล่าสถานการณ์จริงที่เจอ จะช่วยให้ออกแบบได้ตรงกว่าการบอกว่าอยากได้ปุ่มอะไร · Describing the situation helps more than describing the button you have in mind
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: อยากให้เป็นอย่างไร / What you would like
+
+  - type: dropdown
+    id: often
+    attributes:
+      label: เจอบ่อยแค่ไหน / How often does this come up
+      options:
+        - ทุกวัน / Every day
+        - ทุกสัปดาห์ / Every week
+        - นานๆ ครั้ง / Once in a while

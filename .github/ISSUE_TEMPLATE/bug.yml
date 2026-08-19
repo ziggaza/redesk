@@ -1,0 +1,49 @@
+name: 🐞 แจ้งปัญหา / Report a bug
+description: บอกสิ่งที่เกิดขึ้น เพื่อให้แก้ได้ตรงจุด · Tell us what went wrong
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        เขียนภาษาไทยหรืออังกฤษก็ได้ ตามถนัดเลยครับ · Thai or English, whichever you prefer.
+
+        **เคล็ดลับ:** เปิด ReDesk → แท็บ **วิธีใช้งาน** → ปุ่ม **แจ้งปัญหา** จะกรอกข้อมูลระบบให้อัตโนมัติ
+        **Tip:** in ReDesk, open the **How to use** tab and press **Report a bug** — the system information below is filled in for you.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: ตรวจสองข้อนี้ก่อน / Two quick checks first
+      description: สองข้อนี้คือสาเหตุเกือบทั้งหมดของอาการ "คืนค่าแล้วไม่มีอะไรเกิดขึ้น" · These two explain almost every "restore did nothing" report
+      options:
+        - label: ปิด "Auto arrange icons" ของ Windows แล้ว (คลิกขวาบนเดสก์ท็อป → View) · Auto arrange icons is off
+        - label: ไม่ได้เปิดโปรแกรมด้วย Run as administrator · Not running as administrator
+
+  - type: textarea
+    id: what
+    attributes:
+      label: เกิดอะไรขึ้น / What happened
+      description: เล่าตามที่เห็น ถ้ามีภาพหน้าจอแนบมาได้ยิ่งดี · Describe what you saw; a screenshot helps a lot
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: ทำอย่างไรถึงเจอ / How to reproduce it
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: คาดว่าจะเป็นอย่างไร / What you expected instead
+
+  - type: textarea
+    id: system
+    attributes:
+      label: ข้อมูลระบบ / System information
+      description: ปุ่ม "แจ้งปัญหา" ในแอปกรอกช่องนี้ให้เอง หรือกด "คัดลอกข้อมูลระบบ" แล้ววางที่นี่ · Filled in by the app's Report a bug button, or paste what "Copy system information" gives you
+      render: text

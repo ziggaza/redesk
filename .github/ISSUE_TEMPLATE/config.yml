@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📖 คู่มือการใช้งาน / The user guide
+    url: https://ziggaza.github.io/redesk/#faq
+    about: คำถามพบบ่อยอยู่ที่นี่ และคู่มือฉบับเต็มอยู่ในแอป แท็บ "วิธีใช้งาน" · Common questions are answered here, and the full guide is inside the app
+  - name: ⬇ ดาวน์โหลดเวอร์ชันล่าสุด / Get the latest version
+    url: https://github.com/ziggaza/redesk/releases/latest
+    about: ปัญหาบางอย่างแก้ไปแล้วในรุ่นใหม่ · Some problems are already fixed in a newer build
