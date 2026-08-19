@@ -305,7 +305,7 @@
   html.th-wrap summary, html.th-wrap .eyebrow, html.th-wrap .sec-head p,
   html.th-wrap li, html.th-wrap td, html.th-wrap .meta,
   html.th-wrap .lede, html.th-wrap .card p, html.th-wrap .step p, html.th-wrap .prob p,
-  html.th-wrap .dl p{
+  html.th-wrap .dl p, html.th-wrap figcaption{
     word-break:keep-all;
     text-wrap:var(--th-wrap, balance);
     /* Safety valve: keep-all alone would push a run that is wider than its column off the
@@ -318,10 +318,13 @@
   html[lang="en"] summary, html[lang="en"] .eyebrow, html[lang="en"] .sec-head p,
   html[lang="en"] li, html[lang="en"] td, html[lang="en"] .meta,
   html[lang="en"] .lede, html[lang="en"] .card p, html[lang="en"] .step p,
-  html[lang="en"] .prob p, html[lang="en"] .dl p{
+  html[lang="en"] .prob p, html[lang="en"] .dl p, html[lang="en"] figcaption{
     text-wrap:balance;
   }
 
+  /* Captions are prose and sit in a narrow column, where the balancer runs out of room
+     and starts cutting Thai words in half. pretty stays inside the word marks. */
+  html.th-wrap figcaption{text-wrap:pretty}
   /* For short terms that must never be split, whatever the language: "64-bit", "Wi-Fi". */
   .nb{white-space:nowrap}
 
@@ -486,6 +489,7 @@
         <ul>
           <li data-i18n="f3.a">ดูตัวอย่างก่อนคืนค่าจริงเสมอ ไม่มีการเปลี่ยนแปลงแบบไม่ทันตั้งตัว</li>
           <li data-i18n-html="f3.b">แต่ละ snapshot เก็บ <strong>ภาพหน้าจอจริง</strong> แยกตามจอไว้ให้ดูย้อนหลัง</li>
+          <li data-i18n="f3.c">ลบภาพในไทม์ไลน์ทีละรูป หรือล้างเฉพาะรูปทั้งหมดเพื่อคืนพื้นที่ดิสก์ โดยตำแหน่งไอคอนยังอยู่ครบ</li>
         </ul>
       </div>
 
@@ -550,7 +554,7 @@
           <li data-i18n-html="f9.a">ตั้ง<strong>โซนมีชื่อพร้อมกฎ</strong> — ไฟล์ประเภทไหนหรือชื่อขึ้นต้นอะไร ไปโซนไหน</li>
           <li data-i18n="f9.b">ไอคอนใหม่ถูกจัดเข้าโซนที่ตรงกฎเอง ไม่ใช่กองรวมมุมเดียว</li>
           <li data-i18n-html="f9.c"><strong>ปักหมุด</strong>ไอคอนให้อยู่ที่เดิมเสมอ ชนะทุกการคืนค่า</li>
-          <li data-i18n="f9.d">ลากกำหนดพื้นที่โซนบนแผนผังได้โดยตรง</li>
+          <li data-i18n="f9.d">ลากกรอบบนแผนผังเพื่อสร้างโซนใหม่ได้ทันที ไม่ต้องกรอกพิกัด</li>
         </ul>
       </div>
 
@@ -621,11 +625,15 @@
     <div class="shots">
       <figure>
         <img src="assets/shot-dark.png" alt="ReDesk dark theme">
-        <figcaption data-i18n="shot.1">ธีมมืด · ภาษาไทย — mini-map แยกสีตามประเภทไฟล์ พร้อมสถานะระบบและประวัติ snapshot</figcaption>
+        <figcaption data-i18n="shot.1">ธีมมืด · ภาษาไทย — แผนที่ไอคอนแยกสีตามประเภทไฟล์ พร้อมสถานะระบบ ประวัติ snapshot และภาพหน้าจอของทุกจอเรียงคู่กันเหมือนจอจริง</figcaption>
       </figure>
       <figure>
         <img src="assets/shot-light.png" alt="ReDesk light theme">
-        <figcaption data-i18n="shot.2">ธีมสว่าง · ภาษาอังกฤษ — สลับได้ทันทีจากสวิตช์มุมขวาบน</figcaption>
+        <figcaption data-i18n="shot.2">ธีมสว่าง · ภาษาอังกฤษ — สลับได้ทันทีจากสวิตช์มุมขวาบน ทุกแท็บมีไอคอนกำกับให้หาง่าย</figcaption>
+      </figure>
+      <figure class="full">
+        <img src="assets/shot-zone-manual.png" alt="Manually drawn new icon zone">
+        <figcaption data-i18n-html="shot.4">กำหนด <strong>โซนไอคอนใหม่เอง</strong> ด้วยการลากกรอบบนแผนที่ — ไฟล์ใหม่ที่ยังไม่มีใน snapshot จะไปรวมกันในกรอบเส้นประนี้ แทนที่จะกระจายทับของเดิม</figcaption>
       </figure>
       <figure class="full">
         <img src="assets/shot-desktop-capture.jpg" alt="Desktop capture">
@@ -809,6 +817,7 @@ const EN = {
   "f3.p":"Keeps the last 30 snapshots so you can jump back to any of them. Delete them one at a time or clear the lot.",
   "f3.a":"Always previews before it touches anything, so nothing changes unexpectedly",
   "f3.b":"Every snapshot keeps a <strong>real screenshot</strong> of each monitor to look back at",
+  "f3.c":"Delete pictures from the timeline one at a time, or clear the pictures alone to win the disk space back while every icon position stays",
 
   "f4.h":"Mini-map preview",
   "f4.p":"A to-scale map of the whole desktop showing exactly which icons move where, before you commit",
@@ -845,7 +854,7 @@ const EN = {
   "f9.a":"Define <strong>named zones with rules</strong>: which file types, or which name patterns, belong where",
   "f9.b":"New icons are filed into the zone that matches, instead of piling up in one corner",
   "f9.c":"<strong>Pin</strong> an icon and it stays put, outranking every restore",
-  "f9.d":"Drag a zone's area straight onto the map",
+  "f9.d":"Drag a box on the map to create a zone there and then — no coordinates to type",
 
   "f10.h":"Learns from how you work",
   "f10.p":"Watches the history for icons you keep dragging back to the same spot, then offers to pin them",
@@ -877,8 +886,9 @@ const EN = {
   "f14.c":"Thai and English, switching with the rest of the app",
 
   "shot.h":"What it looks like","shot.sub":"Real captures from the running application, not mock-ups",
-  "shot.1":"Dark theme · Thai — mini-map colour-coded by file type, with system status and snapshot history",
-  "shot.2":"Light theme · English — switch instantly from the toggles in the top right",
+  "shot.1":"Dark theme · Thai — the icon map colour-coded by file type, with system status, snapshot history, and every screen's capture laid out side by side the way the monitors are",
+  "shot.2":"Light theme · English — switch instantly from the toggles in the top right; every tab carries its own icon",
+  "shot.4":"<strong>Draw the landing area for new icons yourself</strong> by dragging a box on the map — anything new that is not in the snapshot is gathered inside the dashed frame instead of scattering over what is already there",
   "shot.3":"A screenshot taken at save time — the <strong>real desktop across both monitors</strong>, with no other windows in the way, even though applications were open at the time",
 
   "how.h":"Three steps to set up",
@@ -1065,7 +1075,7 @@ document.querySelectorAll("[data-i18n],[data-i18n-html]").forEach(el => {
    Only headings and the short highlight lines are treated. Body copy already wraps
    fine and is more likely to be copied out of the page.
 --------------------------------------------------------------------------- */
-const WRAPPED = "h1,h2,h3,summary,.eyebrow,.sec-head p,li,td,.meta,.lede,.card p,.step p,.prob p,.dl p";
+const WRAPPED = "h1,h2,h3,summary,.eyebrow,.sec-head p,li,td,.meta,.lede,.card p,.step p,.prob p,.dl p,figcaption";
 const THAI_SEGMENTER = typeof Intl !== "undefined" && Intl.Segmenter
   ? new Intl.Segmenter("th", { granularity: "word" })
   : null;
