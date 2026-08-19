@@ -46,4 +46,6 @@ body:
     attributes:
       label: ข้อมูลระบบ / System information
       description: ปุ่ม "แจ้งปัญหา" ในแอปกรอกช่องนี้ให้เอง หรือกด "คัดลอกข้อมูลระบบ" แล้ววางที่นี่ · Filled in by the app's Report a bug button, or paste what "Copy system information" gives you
-      render: text
+      # No `render:` here on purpose. A rendered textarea is monospace, which would suit this
+      # block, but the app fills this field through a URL query parameter and prefilling is
+      # only reliable on a plain textarea. Legible beats pretty.
