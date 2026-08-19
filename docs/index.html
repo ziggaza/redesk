@@ -118,6 +118,9 @@
     background:var(--accent); color:#fff; font-weight:600; font-size:14px;
     padding:11px 20px; border-radius:9px; border:1px solid var(--accent-hot);
     transition:transform .12s, box-shadow .2s;
+    /* A label that wraps inside a button always looks broken — and English wrapped
+       mid-token, at the hyphen in "64-bit". Labels are short enough to stay on one line. */
+    white-space:nowrap;
   }
   .btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px color-mix(in srgb, var(--accent) 34%, transparent)}
   .btn.ghost{background:transparent;border-color:var(--border);color:var(--text)}
@@ -131,14 +134,18 @@
       radial-gradient(900px 420px at 15% -10%, var(--hero-a), transparent 62%),
       radial-gradient(760px 380px at 88% 8%, var(--hero-b), transparent 60%);
   }
-  .hero{display:grid;grid-template-columns:1.02fr .98fr;gap:52px;align-items:center}
+  /* 1.1fr, not the even split it started as: the Thai headline needs 549px at 50px type
+     and the even split gave it 541, so "ของคุณ" fell to a line of its own. */
+  .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:52px;align-items:center}
   .eyebrow{
     display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--cyan);
     border:1px solid color-mix(in srgb, var(--cyan) 34%, transparent);
     background:color-mix(in srgb, var(--cyan) 9%, transparent);
     padding:5px 13px;border-radius:100px;margin-bottom:20px;
   }
-  h1{font-size:clamp(33px,4.4vw,50px);line-height:1.16;font-weight:700;letter-spacing:-.5px}
+  /* 28px floor, not 33px: at 33px the Thai headline is wider than a 375px phone and Chrome
+     has to cut a word in half to fit it. */
+  h1{font-size:clamp(28px,4.4vw,50px);line-height:1.16;font-weight:700;letter-spacing:-.5px}
   h1 em{font-style:normal;color:var(--accent-hot)}
   .lede{color:var(--muted);font-size:17px;margin:20px 0 14px;max-width:34em}
   .lede strong{color:var(--text)}
@@ -153,15 +160,20 @@
   section[id]{scroll-margin-top:78px}
   section{padding:76px 0;border-top:1px solid var(--border)}
   .sec-head{margin-bottom:44px}
-  h2{font-size:clamp(25px,3vw,33px);font-weight:700;letter-spacing:-.3px}
-  .sec-head p{color:var(--muted);margin-top:13px;font-size:16px;max-width:62ch}
+  h2{font-size:clamp(23px,3vw,33px);font-weight:700;letter-spacing:-.3px}
+  /* 76ch fits the longest Thai section subtitle on one line; at 62ch it spilled two words
+     onto a second line on every desktop width. */
+  .sec-head p{color:var(--muted);margin-top:13px;font-size:16px;max-width:76ch}
 
   .prob{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
   .prob div{background:var(--panel-alt);border:1px solid var(--border);border-radius:12px;padding:22px}
   .prob h3{font-size:15.5px;margin-bottom:9px;color:var(--danger);font-weight:600}
   .prob p{color:var(--muted);font-size:14px}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+  /* min(320px, 100%) rather than a bare 320px: on a 320px-wide phone the content column is
+     only ~305px, and a hard floor of 320 made every card stick out past the edge and the
+     whole page scroll sideways. */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:20px}
   .card{
     background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:26px;
     transition:border-color .18s, transform .18s;
@@ -203,6 +215,8 @@
     display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:100px;
     background:color-mix(in srgb, var(--success) 16%, transparent);
     color:var(--success);border:1px solid color-mix(in srgb, var(--success) 34%, transparent);
+    /* A pill that wraps between the number and its unit ("66 / MB") loses its shape. */
+    white-space:nowrap;
   }
   .tag.warn{
     background:color-mix(in srgb, var(--warning) 16%, transparent);
@@ -211,9 +225,11 @@
 
   details{border:1px solid var(--border);border-radius:11px;padding:17px 20px;margin-bottom:11px;background:var(--panel-alt)}
   details[open]{border-color:var(--accent)}
-  summary{cursor:pointer;font-weight:600;font-size:15px;list-style:none}
+  summary{cursor:pointer;font-weight:600;font-size:15px;list-style:none;position:relative;padding-right:26px}
   summary::-webkit-details-marker{display:none}
-  summary::after{content:"+";float:right;color:var(--accent);font-weight:400;font-size:19px;line-height:1}
+  /* Positioned, not floated. A float inside the block switches text-wrap:balance off, which
+     left the two-line questions with one word alone on the second line. */
+  summary::after{content:"+";position:absolute;right:0;top:0;color:var(--accent);font-weight:400;font-size:19px;line-height:1.4}
   details[open] summary::after{content:"−"}
   details p{color:var(--muted);font-size:14.2px;margin-top:11px}
   details strong{color:var(--text)}
@@ -246,6 +262,8 @@
     margin:20px auto 0;max-width:none;font-size:13.6px;color:var(--text);
     display:flex;justify-content:center;align-items:center;gap:9px;flex-wrap:wrap;
   }
+  /* The row wraps between items, never inside one — "66 / MB" or "Windows / 64-bit". */
+  .dl p.dl-release>span{white-space:nowrap}
   #relVersion{font-weight:700;color:var(--accent-hot);font-variant-numeric:tabular-nums}
   .dl p.dl-alt{
     margin:11px auto 0;max-width:none;
@@ -267,10 +285,96 @@
     background:#0B1622;border-radius:7px;padding:4px 7px;
   }
 
+  /* ---------- line breaking ----------
+     Thai is written without spaces, so the browser has to work out where words end. The
+     script at the bottom does that with Intl.Segmenter and marks each boundary with a
+     zero-width space; `word-break: keep-all` then forbids breaking anywhere else, so a
+     line can only ever end where a word does.
+
+     Which mode is a measured choice, not a preference. Chrome's balancer ignores both the
+     marks and keep-all, so when a line is tight it will cut a word in half to even things
+     out ("ไอคอนเด / สก์ท็อปของคุณ"). Above 340px there is enough room that it never needs
+     to, and it leaves no stranded last lines anywhere on the page; below that it starts
+     cutting, so those widths fall back to `pretty`, which stays inside the legal break
+     points at the cost of the odd short line.
+
+     The rule hangs off .th-wrap, a class that script adds only after it has actually
+     inserted the marks: without them keep-all would turn a Thai sentence into one
+     unbreakable run and push the layout off the screen. */
+  html.th-wrap h1, html.th-wrap h2, html.th-wrap h3,
+  html.th-wrap summary, html.th-wrap .eyebrow, html.th-wrap .sec-head p,
+  html.th-wrap li, html.th-wrap td, html.th-wrap .meta,
+  html.th-wrap .lede, html.th-wrap .card p, html.th-wrap .step p, html.th-wrap .prob p,
+  html.th-wrap .dl p{
+    word-break:keep-all;
+    text-wrap:var(--th-wrap, balance);
+    /* Safety valve: keep-all alone would push a run that is wider than its column off the
+       side of the page. This lets that one case break anywhere rather than overflow. */
+    overflow-wrap:break-word;
+  }
+
+  /* English already breaks at spaces, so the balancer needs no help to stay inside words. */
+  html[lang="en"] h1, html[lang="en"] h2, html[lang="en"] h3,
+  html[lang="en"] summary, html[lang="en"] .eyebrow, html[lang="en"] .sec-head p,
+  html[lang="en"] li, html[lang="en"] td, html[lang="en"] .meta,
+  html[lang="en"] .lede, html[lang="en"] .card p, html[lang="en"] .step p,
+  html[lang="en"] .prob p, html[lang="en"] .dl p{
+    text-wrap:balance;
+  }
+
+  /* For short terms that must never be split, whatever the language: "64-bit", "Wi-Fi". */
+  .nb{white-space:nowrap}
+
   @media(max-width:900px){
     .hero,.shots,.steps,.prob{grid-template-columns:1fr}
     .nav-links a:not(.btn){display:none}
     section{padding:56px 0}
+  }
+
+  /* The nav is one unwrapping row, and below ~560px logo + wordmark + two switches + the
+     download button no longer fit — the whole page scrolled sideways by 75px on a 375px
+     phone. Drop the least load-bearing parts instead of letting it overflow. */
+  @media(max-width:560px){
+    /* Two links side by side do not fit on a phone; stacking beats letting the first one
+       wrap into the second line. */
+    .dl p.dl-alt{flex-direction:column;gap:6px}
+    .dl p.dl-alt .dot{display:none}
+    .nav-in{gap:10px}
+    .brand span{display:none}
+    .nav-links{gap:12px}
+    .switches{gap:8px}
+    .sw-theme{width:52px}
+    .sw-lang{width:72px}
+    .nav-links .btn{padding:9px 13px;font-size:13px}
+  }
+  /* Below ~355px the headline no longer fits at its 28px floor, and the only way to place
+     it is to cut a word apart. Small screens get smaller type instead. */
+  @media(max-width:355px){
+    h1{font-size:24px}
+  }
+  /* Narrower still, and the balancer starts cutting words no matter the type size. */
+  @media(max-width:339px){
+    html.th-wrap{--th-wrap:pretty}
+  }
+
+  /* Under ~360px even the trimmed nav no longer fits, and it was the thing pushing the
+     page sideways. The two switches stay; the download button goes, since the hero repeats
+     it a few hundred pixels down. */
+  @media(max-width:359px){
+    .nav-links .btn{display:none}
+  }
+
+  @media(max-width:480px){
+    .brand{display:none}
+
+    /* Two columns inside 320px left the label column so narrow that a four-word heading
+       came out one word per line. Stacked, the label sits above its value with the full
+       width to itself. */
+    #specs table, #specs tbody, #specs tr, #specs th, #specs td{display:block;width:auto}
+    #specs tr{border-bottom:1px solid var(--border);padding:12px 0}
+    #specs tr:last-child{border-bottom:0}
+    #specs th,#specs td{border-bottom:0;padding:0 2px}
+    #specs th{font-size:12.6px;margin-bottom:4px}
   }
 </style>
 </head>
@@ -411,7 +515,7 @@
         <h3 data-i18n="f6.h">เบาจนลืมว่าเปิดอยู่</h3>
         <p data-i18n="f6.p">ทำงานเงียบๆ ใน System Tray แบบ event-driven ล้วน ไม่มี polling loop</p>
         <ul>
-          <li data-i18n-html="f6.a"><strong>ใช้แรม 20–40 MB</strong> ตอนย่อลง tray</li>
+          <li data-i18n-html="f6.a"><strong>ใช้แรม 20–40&nbsp;MB</strong> ตอนย่อลง tray</li>
           <li data-i18n-html="f6.b"><strong>CPU 0%</strong> ขณะไม่มีอะไรเปลี่ยนแปลง</li>
           <li data-i18n="f6.c">ไฟล์เดียว ไม่ต้องติดตั้ง ไม่ต้องลง runtime เพิ่ม</li>
         </ul>
@@ -547,7 +651,7 @@
       <p data-i18n="spec.sub">สำหรับคนที่อยากรู้ว่าข้างในทำงานยังไง</p>
     </div>
     <table>
-      <tr><th data-i18n="spec.os">ระบบที่รองรับ</th><td data-i18n="spec.osv">Windows 10 (1703 ขึ้นไป) และ Windows 11 · 64-bit</td></tr>
+      <tr><th data-i18n="spec.os">ระบบที่รองรับ</th><td data-i18n-html="spec.osv">Windows 10 (1703 ขึ้นไป) และ Windows 11 · <span class="nb">64-bit</span></td></tr>
       <tr><th data-i18n="spec.req">สิ่งที่ต้องมี</th><td data-i18n="spec.reqv">ไม่มี — ไฟล์หลักรวมทุกอย่างไว้ในตัวแล้ว (ไฟล์ทางเลือกขนาดเล็กต้องมี .NET 10 Desktop Runtime)</td></tr>
       <tr><th data-i18n="spec.size">ขนาดไฟล์</th><td data-i18n-html="spec.sizev">ไฟล์เดียว <span class="tag">66 MB</span> รวม runtime · หรือแบบเล็ก <span class="tag">1.9 MB</span> สำหรับเครื่องที่มี .NET 10 อยู่แล้ว</td></tr>
       <tr><th data-i18n="spec.mem">หน่วยความจำ</th><td data-i18n-html="spec.memv"><span class="tag">20–40 MB</span> ขณะย่อลง System Tray</td></tr>
@@ -616,7 +720,7 @@
           asset names carry no version number and this link never has to be edited again.
         -->
         <a class="btn lg" href="https://github.com/ziggaza/redesk/releases/latest/download/ReDesk-win-x64.exe"
-           data-download data-i18n="dl.cta1">⬇ ดาวน์โหลดสำหรับ Windows 64-bit</a>
+           data-download data-i18n="dl.cta1">⬇ ดาวน์โหลดสำหรับ Windows</a>
         <a class="btn lg ghost" href="#specs" data-i18n="dl.cta2">ดูข้อกำหนดระบบ</a>
       </div>
 
@@ -625,12 +729,14 @@
         <span class="dot">·</span>
         <span id="relSize">66 MB</span>
         <span class="dot">·</span>
-        <span data-i18n="dl.selfcontained">รวม .NET runtime มาแล้ว ไม่ต้องติดตั้งอะไรเพิ่ม</span>
+        <span>Windows 64-bit</span>
+        <span class="dot">·</span>
+        <span data-i18n="dl.selfcontained">รวม .NET runtime มาแล้ว</span>
       </p>
 
       <p class="meta dl-alt">
         <a href="https://github.com/ziggaza/redesk/releases/latest/download/ReDesk-win-x64-net10.exe"
-           data-i18n="dl.alt">มี .NET 10 อยู่แล้ว? โหลดไฟล์เล็ก 1.9 MB</a>
+           data-i18n="dl.alt">มี .NET 10 อยู่แล้ว? โหลดไฟล์เล็ก 1.9&nbsp;MB</a>
         <span class="dot">·</span>
         <a href="https://github.com/ziggaza/redesk/releases" data-i18n="dl.notes">บันทึกการเปลี่ยนแปลงทุกเวอร์ชัน</a>
       </p>
@@ -706,7 +812,7 @@ const EN = {
 
   "f6.h":"Light enough to forget",
   "f6.p":"Sits quietly in the system tray, purely event-driven, with no polling loop",
-  "f6.a":"<strong>20–40 MB of RAM</strong> while minimised to the tray",
+  "f6.a":"<strong>20–40\u00a0MB of RAM</strong> while minimised to the tray",
   "f6.b":"<strong>0% CPU</strong> when nothing is changing",
   "f6.c":"A single file, no installer, no runtime to install",
 
@@ -767,7 +873,7 @@ const EN = {
   "how.3p":"Unplug monitors, change resolution, adjust scaling — the icons come back every time",
 
   "spec.h":"Technical details","spec.sub":"For anyone who wants to know how it works underneath",
-  "spec.os":"Supported systems","spec.osv":"Windows 10 (1703 or later) and Windows 11 · 64-bit",
+  "spec.os":"Supported systems","spec.osv":"Windows 10 (1703 or later) and Windows 11 · <span class=\"nb\">64-bit</span>",
   "spec.req":"Requires",
   "spec.reqv":"Nothing — the main file has everything built in (the optional small build needs the .NET 10 Desktop Runtime)",
   "spec.size":"File size","spec.sizev":"A single <span class=\"tag\">66 MB</span> file with the runtime inside · or a <span class=\"tag\">1.9 MB</span> build for machines that already have .NET 10",
@@ -796,9 +902,9 @@ const EN = {
 
   "dl.h":"Get started with ReDesk",
   "dl.p":"One file, no installer, no admin rights. Delete it whenever you like and it leaves nothing behind.",
-  "dl.cta1":"⬇ Download for Windows 64-bit","dl.cta2":"System requirements","dl.counter":"downloads",
-  "dl.selfcontained":"the .NET runtime is bundled — nothing else to install",
-  "dl.alt":"Already have .NET 10? Get the 1.9 MB build",
+  "dl.cta1":"⬇ Download for Windows","dl.cta2":"System requirements","dl.counter":"downloads",
+  "dl.selfcontained":"the .NET runtime is bundled in",
+  "dl.alt":"Already have .NET 10? Get the 1.9\u00a0MB build",
   "dl.notes":"Release notes for every version",
   "dl.meta":"Windows may show a SmartScreen warning because the file is not code-signed yet — click “More info”, then “Run anyway”",
 
@@ -925,6 +1031,63 @@ document.querySelectorAll("[data-i18n],[data-i18n-html]").forEach(el => {
   THAI.set(key, el.dataset.i18nHtml ? el.innerHTML : el.textContent);
 });
 
+/* ---------------------------------------------------------------------------
+   Thai word boundaries.
+
+   Thai runs words together without spaces, so a browser can only wrap it well if it
+   knows where the words are. Chrome does — but CSS text-wrap:balance ignores that
+   knowledge and cuts words in half, and the heading sizes on this page need balancing
+   to avoid a lone syllable on its own line.
+
+   So the boundaries get written into the text: Intl.Segmenter finds them and a
+   zero-width space marks each one. Paired with word-break:keep-all in the stylesheet
+   that leaves exactly one set of legal break points — the real word ends — and the
+   balancer can only choose among those. U+200B is invisible, has no width, and is
+   ignorable for find-in-page.
+
+   Only headings and the short highlight lines are treated. Body copy already wraps
+   fine and is more likely to be copied out of the page.
+--------------------------------------------------------------------------- */
+const WRAPPED = "h1,h2,h3,summary,.eyebrow,.sec-head p,li,td,.meta,.lede,.card p,.step p,.prob p,.dl p";
+const THAI_SEGMENTER = typeof Intl !== "undefined" && Intl.Segmenter
+  ? new Intl.Segmenter("th", { granularity: "word" })
+  : null;
+
+/* The dictionary does not know these borrowed words and splits them into fragments —
+   "ซิ|งก์", "เด|สก์ท็อป" — so the marks are taken back out and they stay whole. */
+const KEEP_WHOLE = [
+  "เดสก์ท็อป", "ไอคอน", "ซิงก์", "สแนปช็อต", "ไทม์ไลน์", "วอลเปเปอร์", "โปรไฟล์", "ไดรฟ์",
+];
+
+function markThaiWordBreaks(){
+  // No segmenter (older browser) means no marks, and without marks the keep-all rule
+  // would make Thai unbreakable. Leave the class off and keep the browser's own wrapping.
+  if (!THAI_SEGMENTER) return;
+
+  document.querySelectorAll(WRAPPED).forEach(el => {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    let node;
+    while ((node = walker.nextNode())) nodes.push(node);
+
+    nodes.forEach(text => {
+      const clean = text.data.replace(/\u200B/g, "");
+      if (!/[\u0E00-\u0E7F]/.test(clean)) return;      // nothing Thai in here
+      let marked = "";
+      for (const part of THAI_SEGMENTER.segment(clean)) marked += part.segment + "\u200B";
+
+      // Glue the borrowed words back together, marks and all.
+      KEEP_WHOLE.forEach(term => {
+        marked = marked.replace(new RegExp(term.split("").join("\u200B*"), "g"), term);
+      });
+
+      text.data = marked.replace(/\u200B+$/, "");      // no trailing mark
+    });
+  });
+
+  root.classList.add("th-wrap");
+}
+
 function applyLang(lang){
   root.lang = lang;
   document.querySelectorAll("[data-i18n],[data-i18n-html]").forEach(el => {
@@ -934,6 +1097,11 @@ function applyLang(lang){
     if (value === undefined) return;          // untranslated key: leave the Thai in place
     if (html) el.innerHTML = value; else el.textContent = value;
   });
+
+  // Swapping the text above wipes the marks, so they are re-applied every time. THAI holds
+  // the original unmarked copy, which keeps the round trip lossless.
+  if (lang === "en") root.classList.remove("th-wrap"); else markThaiWordBreaks();
+
   localStorage.setItem("redesk.lang", lang);
 }
 
