@@ -501,7 +501,7 @@
         <ul>
           <li data-i18n="f3.a">ดูตัวอย่างก่อนคืนค่าจริงเสมอ ไม่มีการเปลี่ยนแปลงแบบไม่ทันตั้งตัว</li>
           <li data-i18n-html="f3.b">แต่ละ snapshot เก็บ <strong>ภาพหน้าจอจริง</strong> แยกตามจอไว้ให้ดูย้อนหลัง</li>
-          <li data-i18n="f3.c">ลบภาพในไทม์ไลน์ทีละรูป หรือล้างเฉพาะรูปทั้งหมดเพื่อคืนพื้นที่ดิสก์ โดยตำแหน่งไอคอนยังอยู่ครบ</li>
+          <li data-i18n="f3.c">ลบ snapshot ในไทม์ไลน์ทีละรายการ หรือล้างเฉพาะรูปทั้งหมดเพื่อคืนพื้นที่ดิสก์ — อย่างหลังตำแหน่งไอคอนยังอยู่ครบ คืนค่าได้เหมือนเดิม</li>
         </ul>
       </div>
 
@@ -618,7 +618,7 @@
         <h3 data-i18n="f14.h">คู่มืออยู่ในตัวแอป</h3>
         <p data-i18n="f14.p">ไม่ต้องเปิดเว็บหาวิธีใช้ กดแท็บ วิธีใช้งาน ในแอปแล้วอ่านได้ทันที</p>
         <ul>
-          <li data-i18n="f14.a">9 หัวข้อ ครอบคลุมทุกฟีเจอร์ ตั้งแต่เริ่มต้น 3 ขั้นตอนจนถึงการแก้ปัญหา</li>
+          <li data-i18n="f14.a">10 หัวข้อ ครอบคลุมทุกฟีเจอร์ ตั้งแต่เริ่มต้น 3 ขั้นตอนจนถึงการแก้ปัญหาและช่องทางแจ้งปัญหา</li>
           <li data-i18n="f14.b">สารบัญกดกระโดดไปหัวข้อที่ต้องการได้เลย</li>
           <li data-i18n="f14.c">ภาษาไทยและอังกฤษ เปลี่ยนพร้อมกับทั้งแอป</li>
         </ul>
@@ -636,19 +636,31 @@
     </div>
     <div class="shots">
       <figure>
-        <img src="assets/shot-dark.png" alt="ReDesk dark theme">
+        <img src="assets/shot-dark.png"
+             data-alt-th="หน้าจอโปรแกรม ReDesk ธีมมืด ภาษาไทย แสดงแผนที่ไอคอนและประวัติ snapshot"
+             data-alt-en="ReDesk main window, dark theme in Thai, showing the icon map and snapshot history"
+             alt="หน้าจอโปรแกรม ReDesk ธีมมืด ภาษาไทย แสดงแผนที่ไอคอนและประวัติ snapshot">
         <figcaption data-i18n="shot.1">ธีมมืด · ภาษาไทย — แผนที่ไอคอนแยกสีตามประเภทไฟล์ พร้อมสถานะระบบ ประวัติ snapshot และภาพหน้าจอของทุกจอเรียงคู่กันเหมือนจอจริง</figcaption>
       </figure>
       <figure>
-        <img src="assets/shot-light.png" alt="ReDesk light theme">
+        <img src="assets/shot-light.png"
+             data-alt-th="หน้าจอโปรแกรม ReDesk ธีมสว่าง ภาษาอังกฤษ"
+             data-alt-en="ReDesk main window, light theme in English"
+             alt="หน้าจอโปรแกรม ReDesk ธีมสว่าง ภาษาอังกฤษ">
         <figcaption data-i18n="shot.2">ธีมสว่าง · ภาษาอังกฤษ — สลับได้ทันทีจากสวิตช์มุมขวาบน ทุกแท็บมีไอคอนกำกับให้หาง่าย</figcaption>
       </figure>
       <figure class="full">
-        <img src="assets/shot-zone-manual.png" alt="Manually drawn new icon zone">
+        <img src="assets/shot-zone-manual.png"
+             data-alt-th="แท็บโซนของ ReDesk กำลังลากกรอบเส้นประกำหนดโซนไอคอนใหม่บนแผนที่จอ"
+             data-alt-en="ReDesk zones tab with a dashed new-icon zone being drawn on the monitor map"
+             alt="แท็บโซนของ ReDesk กำลังลากกรอบเส้นประกำหนดโซนไอคอนใหม่บนแผนที่จอ">
         <figcaption data-i18n-html="shot.4">กำหนด <strong>โซนไอคอนใหม่เอง</strong> ด้วยการลากกรอบบนแผนที่ — ไฟล์ใหม่ที่ยังไม่มีใน snapshot จะไปรวมกันในกรอบเส้นประนี้ แทนที่จะกระจายทับของเดิม</figcaption>
       </figure>
       <figure class="full">
-        <img src="assets/shot-desktop-capture.jpg" alt="Desktop capture">
+        <img src="assets/shot-desktop-capture.jpg"
+             data-alt-th="ภาพจับหน้าจอเดสก์ท็อปจริงสองจอที่ ReDesk เก็บไว้ตอนบันทึก layout"
+             data-alt-en="Real two-monitor desktop capture stored by ReDesk when a layout is saved"
+             alt="ภาพจับหน้าจอเดสก์ท็อปจริงสองจอที่ ReDesk เก็บไว้ตอนบันทึก layout">
         <figcaption data-i18n-html="shot.3">ภาพหน้าจอที่เก็บตอนกดบันทึก — จับ <strong>เดสก์ท็อปจริงทั้งสองจอ</strong> โดยไม่มีหน้าต่างอื่นมาบัง แม้ตอนนั้นจะเปิดโปรแกรมอะไรค้างไว้ก็ตาม</figcaption>
       </figure>
     </div>
@@ -755,10 +767,16 @@
         <a class="btn lg ghost" href="#specs" data-i18n="dl.cta2">ดูข้อกำหนดระบบ</a>
       </div>
 
+      <!--
+        These two fallback values MUST be bumped as part of every release (they are the
+        contract the script comment below relies on): the GitHub API call that rewrites
+        them fails for anyone rate-limited behind CGNAT or a corporate proxy, and those
+        visitors were being told v1.0.0 three releases after it shipped.
+      -->
       <p class="dl-release">
-        <span id="relVersion">v1.0.0</span>
+        <span id="relVersion">v1.3.1</span>
         <span class="dot">·</span>
-        <span id="relSize">66 MB</span>
+        <span id="relSize">67 MB</span>
         <span class="dot">·</span>
         <span>Windows 64-bit</span>
         <span class="dot">·</span>
@@ -861,7 +879,7 @@ const EN = {
   "f3.p":"Keeps the last 30 snapshots so you can jump back to any of them. Delete them one at a time or clear the lot.",
   "f3.a":"Always previews before it touches anything, so nothing changes unexpectedly",
   "f3.b":"Every snapshot keeps a <strong>real screenshot</strong> of each monitor to look back at",
-  "f3.c":"Delete pictures from the timeline one at a time, or clear the pictures alone to win the disk space back while every icon position stays",
+  "f3.c":"Delete timeline snapshots one at a time, or clear just the pictures to win the disk space back — the latter keeps every icon position, so restoring still works",
 
   "f4.h":"Mini-map preview",
   "f4.p":"A to-scale map of the whole desktop showing exactly which icons move where, before you commit",
@@ -925,7 +943,7 @@ const EN = {
 
   "f14.h":"The manual is inside the app",
   "f14.p":"No need to go looking online — open the How to use tab and read it there",
-  "f14.a":"Nine sections covering every feature, from the three-step start to troubleshooting",
+  "f14.a":"Ten sections covering every feature, from the three-step start to troubleshooting and the feedback channel",
   "f14.b":"A contents list that jumps straight to the section you need",
   "f14.c":"Thai and English, switching with the rest of the app",
 
@@ -1170,6 +1188,15 @@ function markThaiWordBreaks(){
   root.classList.add("th-wrap");
 }
 
+// localStorage THROWS (SecurityError) under "block all cookies", and an uncaught throw
+// here would kill everything below it: theme, language init, the Thai word-break pass
+// and the counter. Every other failure mode on this page is guarded; storage gets the
+// same courtesy and cookie-blocking visitors just lose the persistence, nothing else.
+const store = {
+  get(key){ try { return localStorage.getItem(key); } catch { return null; } },
+  set(key, value){ try { localStorage.setItem(key, value); } catch {} },
+};
+
 function applyLang(lang){
   root.lang = lang;
   document.querySelectorAll("[data-i18n],[data-i18n-html]").forEach(el => {
@@ -1180,17 +1207,23 @@ function applyLang(lang){
     if (html) el.innerHTML = value; else el.textContent = value;
   });
 
+  // Screenshot descriptions switch language too; text swaps miss them because alt is an
+  // attribute, not a text node.
+  document.querySelectorAll("[data-alt-th]").forEach(el => {
+    el.alt = lang === "en" ? (el.dataset.altEn || el.alt) : el.dataset.altTh;
+  });
+
   // Swapping the text above wipes the marks, so they are re-applied every time. THAI holds
   // the original unmarked copy, which keeps the round trip lossless.
   if (lang === "en") root.classList.remove("th-wrap"); else markThaiWordBreaks();
 
-  localStorage.setItem("redesk.lang", lang);
+  store.set("redesk.lang", lang);
 }
 
 function applyTheme(theme){
   root.dataset.theme = theme;
   document.getElementById("knobGlyph").textContent = theme === "light" ? "☀" : "🌙";
-  localStorage.setItem("redesk.theme", theme);
+  store.set("redesk.theme", theme);
 }
 
 document.getElementById("swLang").addEventListener("click", () =>
@@ -1199,10 +1232,19 @@ document.getElementById("swLang").addEventListener("click", () =>
 document.getElementById("swTheme").addEventListener("click", () =>
   applyTheme(root.dataset.theme === "light" ? "dark" : "light"));
 
+// Copied Thai text should not carry the invisible U+200B wrap marks along — pasted into
+// a chat or a document they show up as odd cursor stops and broken searches.
+document.addEventListener("copy", event => {
+  const selection = String(document.getSelection());
+  if (!selection.includes("​")) return;
+  event.clipboardData.setData("text/plain", selection.replaceAll("​", ""));
+  event.preventDefault();
+});
+
 // Saved choice wins; otherwise follow the OS, defaulting to dark like the app does.
-const savedTheme = localStorage.getItem("redesk.theme");
+const savedTheme = store.get("redesk.theme");
 applyTheme(savedTheme || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"));
-applyLang(localStorage.getItem("redesk.lang") || "th");
+applyLang(store.get("redesk.lang") || "th");
 
 // After applyLang so the number is grouped for the language actually on screen.
 initCounter();
