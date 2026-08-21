@@ -499,7 +499,8 @@
         <h3 data-i18n="f3.h">ย้อนเวลาได้ทุกเมื่อ</h3>
         <p data-i18n="f3.p">เก็บประวัติ snapshot ย้อนหลัง 30 ครั้ง กดย้อนกลับไปจุดไหนก็ได้ ลบทีละรายการหรือล้างทั้งหมดได้</p>
         <ul>
-          <li data-i18n="f3.a">ดูตัวอย่างก่อนคืนค่าจริงเสมอ ไม่มีการเปลี่ยนแปลงแบบไม่ทันตั้งตัว</li>
+          <li data-i18n-html="f3.a">ดูตัวอย่างก่อนคืนค่าจริงเสมอ และมี <strong>ปุ่มเลิกทำ</strong> ย้อนกลับได้หลังคืนค่าไปแล้ว</li>
+          <li data-i18n-html="f3.d">ก่อนคืนค่า<strong>ทุกครั้ง</strong> รวมถึงตอนที่ระบบทำให้อัตโนมัติเมื่อเปลี่ยนจอ จะถ่ายตำแหน่งไอคอนวินาทีก่อนหน้าเก็บไว้ให้เสมอ — ปิดโปรแกรมแล้วเปิดใหม่ก็ยังย้อนได้</li>
           <li data-i18n-html="f3.b">แต่ละ snapshot เก็บ <strong>ภาพหน้าจอจริง</strong> แยกตามจอไว้ให้ดูย้อนหลัง</li>
           <li data-i18n="f3.c">ลบ snapshot ในไทม์ไลน์ทีละรายการ หรือล้างเฉพาะรูปทั้งหมดเพื่อคืนพื้นที่ดิสก์ — อย่างหลังตำแหน่งไอคอนยังอยู่ครบ คืนค่าได้เหมือนเดิม</li>
         </ul>
@@ -774,7 +775,7 @@
         visitors were being told v1.0.0 three releases after it shipped.
       -->
       <p class="dl-release">
-        <span id="relVersion">v1.3.1</span>
+        <span id="relVersion">v1.4.0</span>
         <span class="dot">·</span>
         <span id="relSize">67 MB</span>
         <span class="dot">·</span>
@@ -877,7 +878,8 @@ const EN = {
 
   "f3.h":"Rewind any time",
   "f3.p":"Keeps the last 30 snapshots so you can jump back to any of them. Delete them one at a time or clear the lot.",
-  "f3.a":"Always previews before it touches anything, so nothing changes unexpectedly",
+  "f3.a":"Always previews before it touches anything, and an <strong>Undo button</strong> takes a restore back after the fact",
+  "f3.d":"<strong>Every</strong> restore — including the automatic ones when your displays change — is preceded by a snapshot of the desktop one instant earlier, and undo survives closing and reopening the app",
   "f3.b":"Every snapshot keeps a <strong>real screenshot</strong> of each monitor to look back at",
   "f3.c":"Delete timeline snapshots one at a time, or clear just the pictures to win the disk space back — the latter keeps every icon position, so restoring still works",
 
